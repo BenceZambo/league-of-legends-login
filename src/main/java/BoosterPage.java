@@ -36,12 +36,7 @@ public class BoosterPage {
         TableColumn<Order, String> commentColumn = new TableColumn<>("Comment");
         commentColumn.setMinWidth(100);
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("comments"));
-
-        //Button column
-        TableColumn<Button> buttonColumn = new TableColumn<>("Launch");
-        buttonColumn.setMinWidth(100);
-        buttonColumn.setCellValueFactory(new PropertyValueFactory<>("launch"));
-
+        
         table = new TableView<>();
         table.setItems(getOrders());
         table.getColumns().addAll(idColumn, priceColumn, purchaseColumn, commentColumn);
@@ -61,11 +56,11 @@ public class BoosterPage {
 
     public ObservableList<Order> getOrders(){
         ObservableList<Order> products = FXCollections.observableArrayList();
-        products.add(new Order(1, 859.00, "gold to dia", "pls"));
-        products.add(new Order(2, 2.49, "silver to dia", "ne bazd el"));
-        products.add(new Order(3, 99.00, "bronze to silver", "je"));
-        products.add(new Order(4, 19.99, "gold to master", ""));
-        products.add(new Order(5, 1.49, "master to challenger", "ez main"));
+        products.add(new Order(1, 859.00, "gold to dia", "pls", "asd", "asd"));
+        products.add(new Order(2, 2.49, "silver to dia", "ne bazd el", "asd", "asd"));
+        products.add(new Order(3, 99.00, "bronze to silver", "je", "asd", "asd"));
+        products.add(new Order(4, 19.99, "gold to master", "", "asd", "asd"));
+        products.add(new Order(5, 1.49, "master to challenger", "ez main", "asd", "asd"));
         return products;
     }
 
