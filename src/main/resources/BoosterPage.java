@@ -36,7 +36,7 @@ public class BoosterPage {
         TableColumn<Order, String> commentColumn = new TableColumn<>("Comment");
         commentColumn.setMinWidth(100);
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("comments"));
-        
+
         table = new TableView<>();
         table.setItems(getOrders());
         table.getColumns().addAll(idColumn, priceColumn, purchaseColumn, commentColumn);
