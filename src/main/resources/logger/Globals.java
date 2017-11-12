@@ -1,4 +1,4 @@
-package keyLogger;
+package logger;
 
 public class Globals {
     public static final String lolClient = "League of Legends";

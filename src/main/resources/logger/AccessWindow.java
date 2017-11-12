@@ -1,7 +1,8 @@
-package keyLogger;
+package logger;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.ptr.PointerByReference;
 
@@ -19,32 +20,15 @@ public class AccessWindow {
         char[] buffer = new char[MAX_TITLE_LENGTH * 2];
         HWND foregroundWindow = User32DLL.GetForegroundWindow();
         User32DLL.GetWindowTextW(foregroundWindow, buffer, MAX_TITLE_LENGTH);
-        String title = Native.toString(buffer);
-        return title;
+        return Native.toString(buffer);
     }
 
-    static class Psapi
-    {
-        static
-        {
-            Native.register("psapi");
-        }
-
-        public static native int GetModuleBaseNameW(Pointer hProcess, Pointer hmodule, char[] lpBaseName, int size);
+    public boolean checkIfRunning(String process) {
+        HWND hwnd = User32.INSTANCE.FindWindow
+                (null, process);
+        return hwnd != null;
     }
 
-    static class Kernel32
-    {
-        static
-        {
-            Native.register("kernel32");
-        }
-
-        public static int PROCESS_QUERY_INFORMATION = 0x0400;
-        public static int PROCESS_VM_READ = 0x0010;
-
-        public static native Pointer OpenProcess(int dwDesiredAccess, boolean bInheritHandle, Pointer pointer);
-    }
 
     static class User32DLL
     {
