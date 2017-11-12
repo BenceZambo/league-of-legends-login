@@ -6,6 +6,8 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,12 +17,17 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
     private boolean isLogging;
 
     private LolGameLogger() {
-        message = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
-        sendKey = "Enter";
+        super.message = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
+        super.sendKey = "Enter";
     }
 
     public static LolGameLogger getInstance() {
         return ourInstance;
+    }
+
+    @Override
+    void setDefaults() {
+        super.message = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
     }
 
     @Override

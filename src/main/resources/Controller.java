@@ -15,12 +15,10 @@ import java.util.Date;
 
 public class Controller extends Application{
 
-    private String fileName = "src/main/resources/logger/logs/" + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()) + ".csv";
     private String boosterName = "Barney";
 
     private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
     private LolClientLogger lolClientLogger = LolClientLogger.getInstance();
-    private WebService webService =  new WebService(fileName, boosterName);
 
     private AccessWindow accessWindow = new AccessWindow();
 
@@ -64,6 +62,7 @@ public class Controller extends Application{
 
     private void uploadLog() {
         try {
+            WebService webService =  new WebService(lolClientLogger.getFilePath(), boosterName);
             webService.WebService();
         } catch (IOException e) {
             e.printStackTrace();
