@@ -23,18 +23,6 @@ public class AccessWindow {
         return title;
     }
 
-    public String getActiveWindowProcess()
-    {
-        char[] buffer = new char[MAX_TITLE_LENGTH * 2];
-        PointerByReference pointer = new PointerByReference();
-        HWND foregroundWindow = User32DLL.GetForegroundWindow();
-        User32DLL.GetWindowThreadProcessId(foregroundWindow, pointer);
-        Pointer process = Kernel32.OpenProcess(Kernel32.PROCESS_QUERY_INFORMATION | Kernel32.PROCESS_VM_READ, false, pointer.getValue());
-        Psapi.GetModuleBaseNameW(process, null, buffer, MAX_TITLE_LENGTH);
-        String processName = Native.toString(buffer);
-        return processName;
-    }
-
     static class Psapi
     {
         static
