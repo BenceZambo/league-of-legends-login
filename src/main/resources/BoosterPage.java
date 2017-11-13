@@ -9,8 +9,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import static com.sun.org.apache.xml.internal.serializer.Version.getProduct;
-import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BoosterPage {
 
@@ -38,7 +38,7 @@ public class BoosterPage {
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("comments"));
 
         table = new TableView<>();
-        table.setItems(getOrders());
+        table.setItems(initData());
         table.getColumns().addAll(idColumn, priceColumn, purchaseColumn, commentColumn);
 
         Button launchButton = new Button("Launch");
@@ -54,17 +54,27 @@ public class BoosterPage {
         window.show();
     }
 
-    public ObservableList<Order> getOrders(){
+    public ObservableList<Order> initData(){
         ObservableList<Order> products = FXCollections.observableArrayList();
-        products.add(new Order(1, 859.00, "gold to dia", "pls", "asd", "asd"));
-        products.add(new Order(2, 2.49, "silver to dia", "ne bazd el", "asd", "asd"));
-        products.add(new Order(3, 99.00, "bronze to silver", "je", "asd", "asd"));
-        products.add(new Order(4, 19.99, "gold to master", "", "asd", "asd"));
-        products.add(new Order(5, 1.49, "master to challenger", "ez main", "asd", "asd"));
+        products.add(new Order(1, 859.00, "gold to dia", "pls", "asdf", "password1"));
+        products.add(new Order(2, 2.49, "silver to dia", "ne bazd el", "laci", "password2"));
+        products.add(new Order(3, 99.00, "bronze to silver", "je", "Laci", "password3"));
+        products.add(new Order(4, 19.99, "gold to master", "", "peti", "password4"));
+        products.add(new Order(5, 1.49, "master to challenger", "ez main", "répa", "password5"));
+
         return products;
     }
 
     public void launchButtonClicked(){
-        System.out.println("Launch lol.exe");
+        Order orderSelected;
+        List<String> accountData = new ArrayList<>();
+
+        orderSelected = table.getSelectionModel().getSelectedItem();
+
+        String username = orderSelected.getUsername();
+        String password = orderSelected.getPassword();
+
+        accountData.add(username);
+        accountData.add(password);
     }
 }

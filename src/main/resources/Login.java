@@ -12,6 +12,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Login {
 
     public void createLoginWindow(Stage window){
@@ -48,6 +51,15 @@ public class Login {
     Scene scene2 = new Scene(grid2, 800, 500);
 
     btn.setOnAction(e -> {
+        List<String> loginData = new ArrayList<>();
+
+        String username = userTextField.getText();
+        String password = pwBox.getText();
+
+        loginData.add(username);
+        loginData.add(password);
+        // TODO: http request comes here!
+
         if (pwBox.getText().equals("") || userTextField.getText().equals("")) {
             AlertBox.display("Alert", "Invalid username, or password!");
         } else {
