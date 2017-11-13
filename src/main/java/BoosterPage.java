@@ -74,6 +74,9 @@ public class BoosterPage {
         String username = orderSelected.getUsername();
         String password = orderSelected.getPassword();
 
+        System.out.println(username);
+        System.out.println(password);
+
         accountData.add(username);
         accountData.add(password);
     }

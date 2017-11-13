@@ -13,11 +13,13 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Login {
 
     public void createLoginWindow(Stage window){
+
 
     GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -51,20 +53,27 @@ public class Login {
     Scene scene2 = new Scene(grid2, 800, 500);
 
     btn.setOnAction(e -> {
-        List<String> loginData = new ArrayList<>();
+        HttpHandler httpHandler = new HttpHandler();
+        LinkedHashMap<String,String> urlParameters = new LinkedHashMap();
 
         String username = userTextField.getText();
         String password = pwBox.getText();
 
-        loginData.add(username);
-        loginData.add(password);
-        // TODO: http request comes here!
+        urlParameters.put("username", username);
+        urlParameters.put("password", password);
 
-        if (pwBox.getText().equals("") || userTextField.getText().equals("")) {
-            AlertBox.display("Alert", "Invalid username, or password!");
-        } else {
+        String ifAccountValid = "";
+        try {
+            ifAccountValid = httpHandler.sendingPostRequest("http://localhost:9999/", urlParameters);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
+        if (ifAccountValid.equals("true")) {
             BoosterPage boosterPage = new BoosterPage();
             boosterPage.createBoosterPage(window);
+        } else {
+            AlertBox.display("Alert", "Invalid username, or password!");
         }
     });
 
