@@ -36,13 +36,7 @@ public class BoosterPage {
         TableColumn<Order, String> commentColumn = new TableColumn<>("Comment");
         commentColumn.setMinWidth(100);
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("comments"));
-<<<<<<< HEAD
 
-
-
-=======
-        
->>>>>>> e6dea4069bbbed4f7bcc4575e7c1c1398d0fd598
         table = new TableView<>();
         table.setItems(initData());
         table.getColumns().addAll(idColumn, priceColumn, purchaseColumn, commentColumn);
@@ -62,19 +56,12 @@ public class BoosterPage {
 
     public ObservableList<Order> initData(){
         ObservableList<Order> products = FXCollections.observableArrayList();
-<<<<<<< HEAD
         products.add(new Order(1, 859.00, "gold to dia", "pls", "asdf", "password1"));
         products.add(new Order(2, 2.49, "silver to dia", "ne bazd el", "laci", "password2"));
         products.add(new Order(3, 99.00, "bronze to silver", "je", "Laci", "password3"));
         products.add(new Order(4, 19.99, "gold to master", "", "peti", "password4"));
         products.add(new Order(5, 1.49, "master to challenger", "ez main", "répa", "password5"));
-=======
-        products.add(new Order(1, 859.00, "gold to dia", "pls", "asd", "asd"));
-        products.add(new Order(2, 2.49, "silver to dia", "ne bazd el", "asd", "asd"));
-        products.add(new Order(3, 99.00, "bronze to silver", "je", "asd", "asd"));
-        products.add(new Order(4, 19.99, "gold to master", "", "asd", "asd"));
-        products.add(new Order(5, 1.49, "master to challenger", "ez main", "asd", "asd"));
->>>>>>> e6dea4069bbbed4f7bcc4575e7c1c1398d0fd598
+
         return products;
     }
 
