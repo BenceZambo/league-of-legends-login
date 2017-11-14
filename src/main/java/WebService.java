@@ -5,23 +5,27 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import logger.KeyLogger;
+import logger.LolGameLogger;
 
 import java.io.File;
 import java.io.IOException;
 
 public class WebService {
 
-    private final String bucketName = "boostroyaltest";
-    private static final String accessKey = "AKIAJ27Z2I57CZTRT7XQ";
-    private static final String secretKey = "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";
+    private final String bucketName = "booostroyaltest";
+    private final String basePath = System.getProperty("user.dir");
+    private static final String accessKey = "AKIAJNQY57TDNCL7PT2A";
+    private static final String secretKey = "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";
 
     private String keyName;
     private String uploadFileName;
 
+
     public WebService(String uploadFileName, String keyName)
     {
-        this.uploadFileName = uploadFileName;
-        this.keyName = keyName;
+        this.uploadFileName =  basePath + "/" + uploadFileName;
+        this.keyName = keyName + "/" + LolGameLogger.getInstance().getFileName();
     }
 
     public static AWSCredentials createAWSCredentials(){

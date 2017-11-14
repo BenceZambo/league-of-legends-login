@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Controller extends Application{
-    public String boosterName = "Barney";
+    public static String boosterName = "Barney";
 
     private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
     private LolClientLogger lolClientLogger = LolClientLogger.getInstance();
@@ -46,9 +46,11 @@ public class Controller extends Application{
 
                 if(isLolGameRunning || isLolClientRunning) {
                     event.consume();
-                    AlertBox.display("You can't close me", "Sorry dude, you can not close me if lol is runnig.");
+                    AlertBox.display("You can't close me", "Sorry dude, you can not close me if lol is running.");
                 } else {
                     uploadLog();
+                    lolGameLogger.turnOff();
+                    lolClientLogger.turnOff();
                 }
             }
         });

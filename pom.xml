@@ -126,7 +126,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.0.002</version>
+            <version>1.11.106</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.json/json -->
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
