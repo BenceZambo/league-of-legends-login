@@ -14,12 +14,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Controller extends Application{
-    private String boosterName = "Barney";
+    public String boosterName = "Barney";
 
-    //private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
-    //private LolClientLogger lolClientLogger = LolClientLogger.getInstance();
+    private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
+    private LolClientLogger lolClientLogger = LolClientLogger.getInstance();
 
-    //private AccessWindow accessWindow = new AccessWindow();
+    private AccessWindow accessWindow = new AccessWindow();
 
     private boolean isLolClientRunning = true;
     private boolean isLolGameRunning = false;
@@ -32,11 +32,11 @@ public class Controller extends Application{
 
     @Override
     public void start(Stage primaryStage) throws IOException, NativeHookException {
-        //TaskKiller.requestRunningProccesses();
+        TaskKiller.requestRunningProccesses();
         primaryStage.setTitle("Booster App");
-        //Platform.setImplicitExit(false);
+        Platform.setImplicitExit(false);
 
-        /*primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
                 isLolClientRunning = accessWindow.checkIfRunning(Globals.lolClient);
@@ -51,23 +51,23 @@ public class Controller extends Application{
                     uploadLog();
                 }
             }
-        });*/
+        });
         Login loginWindow = new Login();
 
         loginWindow.createLoginWindow(primaryStage);
 
-        //lolGameLogger.turnOn();
-        //lolClientLogger.turnOn();
+        lolGameLogger.turnOn();
+        lolClientLogger.turnOn();
     }
 
-    /*private void uploadLog() {
+    private void uploadLog() {
         try {
             WebService webService =  new WebService(lolClientLogger.getFilePath(), boosterName);
             webService.WebService();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
     public static void setToken(String token){
         Controller.token = token;

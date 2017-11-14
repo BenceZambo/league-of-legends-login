@@ -12,9 +12,9 @@ import java.util.Scanner;
 
 public abstract class KeyLogger {
 
-    private String badWordsFilePath = "src/main/resources/logger/BadWords.csv";
-    String filePath = "src/main/resources/logger/logs/" + getCurrentTime() + ".csv";
-    String warningFilePath = "src/main/resources/logger/logs/" + "WARNING!_" + getCurrentTime() + ".csv";
+    private String badWordsFilePath = "src/main/java/logger/BadWords.csv";
+    String filePath = "src/main/java/logger/logs/" + getCurrentTime() + ".csv";
+    String warningFilePath = "src/main/java/logger/logs/" + "WARNING!_" + getCurrentTime() + ".csv";
 
 
     String message;
