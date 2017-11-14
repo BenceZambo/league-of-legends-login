@@ -55,6 +55,7 @@ public class HttpHandler {
     public String sendingPostRequest(String url, LinkedHashMap<String,String> parameters) throws Exception {
 
         URL obj = new URL(url);
+
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
         // Setting basic post request

@@ -50,7 +50,7 @@ public class Login {
         grid.add(hbBtn, 1, 4);
 
     GridPane grid2 = new GridPane();
-    Scene scene2 = new Scene(grid2, 800, 500);
+    Scene scene2 = new Scene(grid2, 1000, 750);
 
     btn.setOnAction(e -> {
         HttpHandler httpHandler = new HttpHandler();
@@ -64,16 +64,20 @@ public class Login {
 
         String ifAccountValid = "";
         try {
-            ifAccountValid = httpHandler.sendingPostRequest("http://localhost:9999/", urlParameters);
+            ifAccountValid = httpHandler.sendingPostRequest("http://localhost:9999/login", urlParameters);
+            System.out.println(ifAccountValid);
         } catch (Exception e1) {
             e1.printStackTrace();
         }
 
-        if (ifAccountValid.equals("true")) {
+
+        if (ifAccountValid.equals("false")) {
+            AlertBox.display("Alert", "Invalid username, or password!");
+
+        } else if(ifAccountValid.equals("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxLCJpYXQiOjE1MTA0MTgyMDl9.xqOb4YCQXIKLrovARyifb9KiKUkAJnRtyeS3bVofnqQ")) {
+            Controller.setToken(ifAccountValid);
             BoosterPage boosterPage = new BoosterPage();
             boosterPage.createBoosterPage(window);
-        } else {
-            AlertBox.display("Alert", "Invalid username, or password!");
         }
     });
 

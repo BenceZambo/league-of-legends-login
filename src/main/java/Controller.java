@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Controller extends Application{
-
     private String boosterName = "Barney";
 
     //private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
@@ -29,6 +28,7 @@ public class Controller extends Application{
     public static void main(String[] args) {
         launch(args);
     }
+    private static String token;
 
     @Override
     public void start(Stage primaryStage) throws IOException, NativeHookException {
@@ -68,4 +68,8 @@ public class Controller extends Application{
             e.printStackTrace();
         }
     }*/
+
+    public static void setToken(String token){
+        Controller.token = token;
+    }
 }

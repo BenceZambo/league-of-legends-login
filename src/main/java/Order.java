@@ -1,42 +1,50 @@
 public class Order {
-    private int id;
-    private double price;
-    private String purchase;
-    private String comments;
-    private String username;
-    private String password;
+    String purchase;
+    String loginname;
+    String loginpassword;
+    Integer id;
+    Integer status;
 
-    public Order(int id, double price, String purchase, String comments, String username, String password) {
-        this.id = id;
-        this.price = price;
-        this.purchase = purchase;
-        this.comments = comments;
-        this.username = username;
-        this.password = password;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public double getPrice() {
-        return price;
+    public Order() {
     }
 
     public String getPurchase() {
         return purchase;
     }
 
-    public String getComments() {
-        return comments;
+    public void setPurchase(String purchase) {
+        this.purchase = purchase;
     }
 
-    public String getUsername() {
-        return username;
+    public String getLoginname() {
+        return loginname;
     }
 
-    public String getPassword() {
-        return password;
+    public void setLoginname(String loginname) {
+        this.loginname = loginname;
     }
 
+    public String getLoginpassword() {
+        return loginpassword;
+    }
+
+    public void setLoginpassword(String loginpassword) {
+        this.loginpassword = loginpassword;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 }
