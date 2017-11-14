@@ -1,3 +1,5 @@
+package view;
+
 import com.google.gson.Gson;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,6 +11,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import webService.HttpHandler;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,7 +28,7 @@ public class BoosterPage {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         //Price column
-        /*TableColumn<Order, Double> priceColumn = new TableColumn<>("Price");
+        /*TableColumn<view.Order, Double> priceColumn = new TableColumn<>("Price");
         priceColumn.setMinWidth(100);
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));*/
 

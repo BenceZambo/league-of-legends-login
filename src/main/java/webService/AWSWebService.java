@@ -1,3 +1,5 @@
+package webService;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
@@ -11,7 +13,7 @@ import logger.LolGameLogger;
 import java.io.File;
 import java.io.IOException;
 
-public class WebService {
+public class AWSWebService {
 
     private final String bucketName = "booostroyaltest";
     private final String basePath = System.getProperty("user.dir");
@@ -22,7 +24,7 @@ public class WebService {
     private String uploadFileName;
 
 
-    public WebService(String uploadFileName, String keyName)
+    public AWSWebService(String uploadFileName, String keyName)
     {
         this.uploadFileName =  basePath + "/" + uploadFileName;
         this.keyName = keyName + "/" + LolGameLogger.getInstance().getFileName();

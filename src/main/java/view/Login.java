@@ -1,3 +1,5 @@
+package view;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,10 +13,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import webService.HttpHandler;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 public class Login {
 
@@ -75,7 +76,7 @@ public class Login {
             AlertBox.display("Alert", "Invalid username, or password!");
 
         } else if(ifAccountValid.equals("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxLCJpYXQiOjE1MTA0MTgyMDl9.xqOb4YCQXIKLrovARyifb9KiKUkAJnRtyeS3bVofnqQ")) {
-            Controller.setToken(ifAccountValid);
+            Loginer.setToken(ifAccountValid);
             BoosterPage boosterPage = new BoosterPage();
             boosterPage.createBoosterPage(window);
         }

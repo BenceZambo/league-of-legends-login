@@ -1,19 +1,20 @@
-import javafx.application.Application;
+package view;
+
+import environment.TaskKiller;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import logger.AccessWindow;
+import environment.AccessWindow;
 import logger.Globals;
 import logger.LolClientLogger;
 import logger.LolGameLogger;
 import org.jnativehook.NativeHookException;
+import webService.AWSWebService;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-public class Controller extends Application{
+public class Loginer extends javafx.application.Application {
     public static String boosterName = "Barney";
 
     private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
@@ -24,16 +25,12 @@ public class Controller extends Application{
     private boolean isLolClientRunning = true;
     private boolean isLolGameRunning = false;
 
-
-    public static void main(String[] args) {
-        launch(args);
-    }
     private static String token;
 
     @Override
     public void start(Stage primaryStage) throws IOException, NativeHookException {
         TaskKiller.requestRunningProccesses();
-        primaryStage.setTitle("Booster App");
+        primaryStage.setTitle("Booster view.Loginer");
         Platform.setImplicitExit(false);
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -41,8 +38,6 @@ public class Controller extends Application{
             public void handle(WindowEvent event) {
                 isLolClientRunning = accessWindow.checkIfRunning(Globals.lolClient);
                 isLolGameRunning = accessWindow.checkIfRunning(Globals.lolGame);
-                System.out.println(isLolClientRunning);
-                System.out.println(isLolGameRunning);
 
                 if(isLolGameRunning || isLolClientRunning) {
                     event.consume();
@@ -64,7 +59,7 @@ public class Controller extends Application{
 
     private void uploadLog() {
         try {
-            WebService webService =  new WebService(lolClientLogger.getFilePath(), boosterName);
+            AWSWebService webService =  new AWSWebService(lolClientLogger.getFilePath(), boosterName);
             webService.WebService();
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,6 +67,6 @@ public class Controller extends Application{
     }
 
     public static void setToken(String token){
-        Controller.token = token;
+        Loginer.token = token;
     }
 }

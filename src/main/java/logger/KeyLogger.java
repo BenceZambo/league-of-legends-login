@@ -1,5 +1,6 @@
 package logger;
 
+import environment.AccessWindow;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
