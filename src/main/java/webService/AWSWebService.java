@@ -17,8 +17,8 @@ public class AWSWebService {
 
     private final String bucketName = "booostroyaltest";
     private final String basePath = System.getProperty("user.dir");
-    private static final String accessKey = "AKIAJNQY57TDNCL7PT2A";
-    private static final String secretKey = "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";
+    private static final String accessKey = "AKIAJE2FNQ3UUWY7IELQ";
+    private static final String secretKey = "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";
 
     private String keyName;
     private String uploadFileName;
