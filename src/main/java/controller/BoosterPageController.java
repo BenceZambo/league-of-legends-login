@@ -33,6 +33,8 @@ public class BoosterPageController implements Initializable {
     @FXML
     private TableColumn<Order, String> purchase_column;
     @FXML
+    private TableColumn<Order, String> realm_column;
+    @FXML
     private TableColumn<Order, String> status_column;
 
 
@@ -87,9 +89,10 @@ public class BoosterPageController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        id_column.setCellValueFactory(new PropertyValueFactory<Order, String>("id"));
-        purchase_column.setCellValueFactory(new PropertyValueFactory<Order, String>("purchase"));
-        status_column.setCellValueFactory(new PropertyValueFactory<Order, String>("status"));
+        id_column.setCellValueFactory(new PropertyValueFactory<>("id"));
+        purchase_column.setCellValueFactory(new PropertyValueFactory<>("purchase"));
+        realm_column.setCellValueFactory(new PropertyValueFactory<>("realm"));
+        status_column.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         table.getItems().setAll(initData());
     }

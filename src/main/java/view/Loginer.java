@@ -52,7 +52,7 @@ public class Loginer extends javafx.application.Application {
             }
         });*/
 
-        primaryStage.setTitle("Booster view.Loginer");
+        primaryStage.setTitle("BoostRoyal");
         Parent loginXML = FXMLLoader.load(getClass().getResource("/templates/Login.fxml"));
         Scene scene = new Scene(loginXML);
         primaryStage.setScene(scene);

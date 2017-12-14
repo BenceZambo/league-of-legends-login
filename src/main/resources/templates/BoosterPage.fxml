@@ -4,21 +4,26 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
+<?scenebuilder-stylesheet ../BoosterPage.css?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.BoosterPageController">
+<BorderPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: skyblue;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.BoosterPageController">
    <top>
-      <Button mnemonicParsing="false" onAction="#signoutButtonHandler" prefHeight="42.0" prefWidth="81.0" style="-fx-background-color: skyblue; -fx-border-color: black;" text="Sign out" BorderPane.alignment="CENTER_RIGHT" />
+      <Button fx:id="signOut" mnemonicParsing="false" onAction="#signoutButtonHandler" prefHeight="42.0" prefWidth="124.0" stylesheets="/css/SignOut.css" text="Sign out" BorderPane.alignment="CENTER_RIGHT" />
    </top>
    <center>
-      <TableView fx:id="table" style="-fx-background-image: url(//home/zambo/IdeaProjects/boostroyal/src/main/resources/pictures/boost-royal.jpg); -fx-background-color: skyblue;" BorderPane.alignment="CENTER">
+      <TableView fx:id="table" stylesheets="/css/TableView.css" BorderPane.alignment="CENTER">
         <columns>
           <TableColumn fx:id="id_column" text="Id" />
           <TableColumn fx:id="purchase_column" prefWidth="436.0" text="Purchase" />
+            <TableColumn fx:id="realm_column" text="Realm" />
             <TableColumn fx:id="status_column" text="Status" />
         </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
       </TableView>
    </center>
    <bottom>
-      <Button mnemonicParsing="false" onAction="#launchButtonClicked" prefHeight="71.0" prefWidth="110.0" style="-fx-background-color: red; -fx-font-size: 20; -fx-border-color: orange;" text="Launch" textFill="#eee9e9" BorderPane.alignment="CENTER" />
+      <Button fx:id="launchButton" mnemonicParsing="false" onAction="#launchButtonClicked" prefHeight="71.0" prefWidth="110.0" stylesheets="/css/LaunchButton.css" text="Launch" textFill="#eee9e9" BorderPane.alignment="CENTER" />
    </bottom>
 </BorderPane>

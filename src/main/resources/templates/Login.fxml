@@ -50,7 +50,7 @@
                   <Insets top="25.0" />
                </VBox.margin>
             </Region>
-            <Button fx:id="login" alignment="CENTER" mnemonicParsing="false" onAction="#handleLoginButton" style="-fx-background-color: skyblue; -fx-font-size: 15; -fx-font-weight: bold; -fx-border-color: black;" text="Login">
+            <Button fx:id="login" stylesheets="/css/LogIn.css" alignment="CENTER" mnemonicParsing="false" onAction="#handleLoginButton" text="Login">
                <VBox.margin>
                   <Insets bottom="5.0" left="100.0" right="5.0" top="5.0" />
                </VBox.margin>
