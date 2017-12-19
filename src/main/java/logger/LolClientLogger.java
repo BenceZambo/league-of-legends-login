@@ -1,5 +1,6 @@
 package logger;
 
+import com.sun.jna.platform.win32.User32;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;

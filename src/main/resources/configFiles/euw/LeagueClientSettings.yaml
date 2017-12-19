@@ -1,0 +1,15 @@
+install:
+    globals:
+        locale: "en_GB"
+        region: "EUW"
+    icon_version: 2
+    last-valid-login-splash:
+        theme: "snowdown2017"
+        version: "1.27"
+    licensesAgreedTo:
+        0780B6AC13D0DA5F7E66AB31D1D3824A: null
+        EFDB49DB3E0B83FCC7326C74EC19E37E: null
+    rso-auth:
+        install-identifier: "faaffe2e7a4d354e99a52a8bd23a593f"
+    telemetry:
+        installation_id: "4R7IZQ=="
