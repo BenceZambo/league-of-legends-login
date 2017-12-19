@@ -1,5 +1,6 @@
 package view;
 
+import controller.LoginController;
 import environment.TaskKiller;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -28,8 +29,6 @@ public class Loginer extends javafx.application.Application {
     //private boolean isLolClientRunning = true;
     //private boolean isLolGameRunning = false;
 
-    private static String token;
-
     @Override
     public void start(Stage primaryStage) throws IOException, NativeHookException {
         /*TaskKiller.requestRunningProccesses();
@@ -51,10 +50,12 @@ public class Loginer extends javafx.application.Application {
                 }
             }
         });*/
-
+        LoginController loginController = new LoginController();
         primaryStage.setTitle("BoostRoyal");
-        Parent loginXML = FXMLLoader.load(getClass().getResource("/templates/Login.fxml"));
-        Scene scene = new Scene(loginXML);
+        FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));
+        loginXML.setController(loginController);
+        Parent root = loginXML.load();
+        Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -70,8 +71,4 @@ public class Loginer extends javafx.application.Application {
             e.printStackTrace();
         }
     }*/
-
-    public static void setToken(String token){
-        Loginer.token = token;
-    }
 }

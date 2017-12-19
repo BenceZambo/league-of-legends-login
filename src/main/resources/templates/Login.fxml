@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.PasswordField?>
-<GridPane disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" style="-fx-background-color: white; -fx-border-color: skyblue; -fx-border-style: solid; -fx-border-width: 5px;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+<GridPane disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" style="-fx-background-color: white; -fx-border-color: skyblue; -fx-border-style: solid; -fx-border-width: 5px;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
    <Pane>
          <children>
             <ImageView fitHeight="289.0" fitWidth="312.0" layoutX="14.0" layoutY="115.0" pickOnBounds="true" preserveRatio="true">
@@ -50,7 +50,7 @@
                   <Insets top="25.0" />
                </VBox.margin>
             </Region>
-            <Button fx:id="login" stylesheets="/css/LogIn.css" alignment="CENTER" mnemonicParsing="false" onAction="#handleLoginButton" text="Login">
+            <Button fx:id="login" stylesheets="/css/LogIn.css" alignment="CENTER" mnemonicParsing="false" text="Login">
                <VBox.margin>
                   <Insets bottom="5.0" left="100.0" right="5.0" top="5.0" />
                </VBox.margin>

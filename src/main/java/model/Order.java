@@ -1,4 +1,4 @@
-package view;
+package model;
 
 public class Order {
     String purchase;
@@ -6,6 +6,7 @@ public class Order {
     String loginpassword;
     Integer id;
     Integer status;
+    Server server;
 
     public Order() {
     }
@@ -48,5 +49,13 @@ public class Order {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

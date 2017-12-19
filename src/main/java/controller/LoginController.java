@@ -1,22 +1,30 @@
 package controller;
 
+import com.google.gson.Gson;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import model.User;
 import view.AlertBox;
-import view.Loginer;
 import webService.HttpHandler;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.LinkedHashMap;
+import java.util.ResourceBundle;
 
-public class LoginController {
+public class LoginController implements Initializable{
     @FXML
     TextField password, username;
+
+    @FXML
+    Button login;
 
     @FXML
     public void handleLoginButton(javafx.event.ActionEvent event) throws IOException {
@@ -26,29 +34,44 @@ public class LoginController {
         String username = this.username.getText();
         String password = this.password.getText();
 
-        urlParameters.put("username", username);
+        urlParameters.put("email", username);
         urlParameters.put("password", password);
 
-        String ifAccountValid = "";
+        String token = "";
         try {
-            ifAccountValid = httpHandler.sendingPostRequest("http://localhost:9999/login", urlParameters);
-            System.out.println(ifAccountValid);
+            token = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/auth/login", urlParameters);
+            System.out.println(token);
         } catch (Exception e1) {
             e1.printStackTrace();
         }
 
 
-        if (ifAccountValid.equals("false")) {
+        if (token.equals("")) {
             AlertBox.display("Alert", "Invalid username, or password!");
 
-        } else if(ifAccountValid.equals("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxLCJpYXQiOjE1MTA0MTgyMDl9.xqOb4YCQXIKLrovARyifb9KiKUkAJnRtyeS3bVofnqQ")) {
-            Loginer.setToken(ifAccountValid);
-            Parent loginXML = FXMLLoader.load(getClass().getResource("/templates/BoosterPage.fxml"));
-            Scene scene = new Scene(loginXML);
+        } else if(token != null) {
+            Gson gson = new Gson();
+            User user = gson.fromJson(token, User.class);
+            BoosterPageController boosterPageController = new BoosterPageController(user);
+            FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/BoosterPage.fxml"));
+            loginXML.setController(boosterPageController);
+            Parent root = loginXML.load();
+            Scene scene = new Scene(root);
             Node node=(Node) event.getSource();
             Stage stage=(Stage) node.getScene().getWindow();
             stage.setScene(scene);
             stage.show();
         }
-    };
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        login.setOnAction(event -> {
+            try {
+                handleLoginButton(event);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 }

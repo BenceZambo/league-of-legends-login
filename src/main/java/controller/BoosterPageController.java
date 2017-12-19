@@ -10,12 +10,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import model.Server;
+import model.User;
 import view.Loginer;
-import view.Order;
+import model.Order;
 import webService.HttpHandler;
 
 import java.io.IOException;
@@ -26,6 +29,11 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class BoosterPageController implements Initializable {
+    User user;
+    @FXML
+    Button signOut;
+    @FXML
+    Button launchButton;
     @FXML
     TableView<Order> table;
     @FXML
@@ -33,13 +41,16 @@ public class BoosterPageController implements Initializable {
     @FXML
     private TableColumn<Order, String> purchase_column;
     @FXML
-    private TableColumn<Order, String> realm_column;
+    private TableColumn<Order, String> server_column;
     @FXML
     private TableColumn<Order, String> status_column;
 
+    public BoosterPageController(User user) {
+        this.user = user;
+    }
 
     @FXML
-    public void launchButtonClicked() {
+    public void launchButtonHandler() {
         Order orderSelected;
         List<String> accountData = new ArrayList<>();
 
@@ -48,10 +59,12 @@ public class BoosterPageController implements Initializable {
         String username = orderSelected.getLoginname();
         String password = orderSelected.getLoginpassword();
         String purchase = orderSelected.getPurchase();
+        Server server = orderSelected.getServer();
 
         System.out.println(purchase);
         System.out.println(username);
         System.out.println(password);
+        System.out.println(server);
 
         accountData.add(username);
         accountData.add(password);
@@ -59,7 +72,6 @@ public class BoosterPageController implements Initializable {
 
     @FXML
     public void signoutButtonHandler(ActionEvent event) throws IOException {
-        Loginer.setToken("");
         Parent loginXML = FXMLLoader.load(getClass().getResource("/templates/Login.fxml"));
         Scene scene = new Scene(loginXML);
         Node node=(Node) event.getSource();
@@ -72,14 +84,15 @@ public class BoosterPageController implements Initializable {
         HttpHandler httpHandler = new HttpHandler();
         Gson gson = new Gson();
         LinkedHashMap<String, String> urlParameters = new LinkedHashMap();
-        urlParameters.put("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxLCJpYXQiOjE1MTA0MTgyMDl9.xqOb4YCQXIKLrovARyifb9KiKUkAJnRtyeS3bVofnqQ");
+        urlParameters.put("access_token", user.getToken());
         ObservableList<Order> products = FXCollections.observableArrayList();
         String response = "";
         try {
-            response = httpHandler.sendingPostRequest("http://localhost:9999/", urlParameters);
+            response = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/order/getOrders", urlParameters);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println(response);
         Order[] postResponse = gson.fromJson(response, Order[].class);
         for (int i = 0; i < postResponse.length; i++) {
             products.add(postResponse[i]);
@@ -91,9 +104,20 @@ public class BoosterPageController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         id_column.setCellValueFactory(new PropertyValueFactory<>("id"));
         purchase_column.setCellValueFactory(new PropertyValueFactory<>("purchase"));
-        realm_column.setCellValueFactory(new PropertyValueFactory<>("realm"));
+        server_column.setCellValueFactory(new PropertyValueFactory<>("server"));
         status_column.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        launchButton.setOnAction(event -> launchButtonHandler());
+
+        signOut.setOnAction(event -> {
+            try {
+                signoutButtonHandler(event);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         table.getItems().setAll(initData());
     }
+
 }
