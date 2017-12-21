@@ -76,8 +76,11 @@ public class BoosterPageController implements Initializable {
 
     @FXML
     public void signoutButtonHandler(ActionEvent event) throws IOException {
-        Parent loginXML = FXMLLoader.load(getClass().getResource("/templates/Login.fxml"));
-        Scene scene = new Scene(loginXML);
+        LoginController loginController = new LoginController();
+        FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));
+        loginXML.setController(loginController);
+        Parent root = loginXML.load();
+        Scene scene = new Scene(root);
         Node node=(Node) event.getSource();
         Stage stage=(Stage) node.getScene().getWindow();
         stage.setScene(scene);

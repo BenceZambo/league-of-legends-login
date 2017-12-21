@@ -37,19 +37,16 @@ public class LoginController implements Initializable{
         urlParameters.put("email", username);
         urlParameters.put("password", password);
 
-        String token = "";
+        String token;
         try {
             token = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/auth/login", urlParameters);
             System.out.println(token);
         } catch (Exception e1) {
-            e1.printStackTrace();
+            token = null;
         }
 
 
-        if (token.equals("")) {
-            AlertBox.display("Alert", "Invalid username, or password!");
-
-        } else if(token != null) {
+        if(token != null) {
             Gson gson = new Gson();
             User user = gson.fromJson(token, User.class);
             BoosterPageController boosterPageController = new BoosterPageController(user);
@@ -61,6 +58,8 @@ public class LoginController implements Initializable{
             Stage stage=(Stage) node.getScene().getWindow();
             stage.setScene(scene);
             stage.show();
+        }else{
+            AlertBox.display("Alert", "Invalid username, or password!");
         }
     }
 
