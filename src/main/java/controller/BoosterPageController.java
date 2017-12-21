@@ -1,6 +1,9 @@
 package controller;
 
 import com.google.gson.Gson;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef;
+import environment.AccessWindow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,12 +18,16 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import logger.Globals;
 import model.Server;
 import model.User;
+import view.AlertBox;
 import view.Loginer;
 import model.Order;
 import webService.HttpHandler;
 
+import javax.xml.bind.annotation.XmlElementDecl;
+import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -52,22 +59,26 @@ public class BoosterPageController implements Initializable {
     @FXML
     public void launchButtonHandler() {
         Order orderSelected;
-        List<String> accountData = new ArrayList<>();
+        AccessWindow accessWindow = new AccessWindow();
 
         orderSelected = table.getSelectionModel().getSelectedItem();
 
         String username = orderSelected.getLoginname();
         String password = orderSelected.getLoginpassword();
-        String purchase = orderSelected.getPurchase();
-        Server server = orderSelected.getServer();
 
-        System.out.println(purchase);
         System.out.println(username);
         System.out.println(password);
-        System.out.println(server);
 
-        accountData.add(username);
-        accountData.add(password);
+        if (accessWindow.checkIfRunning(Globals.lolClient)){
+            AutoLoginer autoLoginer = new AutoLoginer();
+            try {
+                autoLoginer.logMeIn(username, password);
+            } catch (AWTException e) {
+                AlertBox.display("Login fail", "Can't login");
+            }
+        } else {
+            AlertBox.display("Client does not run", "Please run the League of Legends client");
+        }
     }
 
     @FXML
