@@ -5,7 +5,7 @@ public class Order {
     String loginname;
     String loginpassword;
     Integer id;
-    Integer status;
+    Status status;
     Server server;
 
     public Order() {
@@ -43,11 +43,11 @@ public class Order {
         this.id = id;
     }
 
-    public Integer getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

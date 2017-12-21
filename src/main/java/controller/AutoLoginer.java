@@ -3,7 +3,6 @@ package controller;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import logger.Globals;
-import view.AlertBox;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -18,9 +17,8 @@ public class AutoLoginer {
 
     public void logMeIn(String username, String password) throws AWTException {
         Robot robot = new Robot();
-        robot.setAutoDelay(5);
+        robot.setAutoDelay(3);
         robot.setAutoWaitForIdle(true);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Clipboard clipBoard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
         StringSelection accountName = new StringSelection(username);
@@ -32,20 +30,22 @@ public class AutoLoginer {
         User32.INSTANCE.SetForegroundWindow(hwnd);
         WinDef.RECT rect = new WinDef.RECT();
         User32.INSTANCE.GetWindowRect(hwnd, rect);
+        int windowLeftCoordinate = rect.left;
+        int windowTopCoordinate = rect.top;
         int windowHeight = rect.toRectangle().height;
         int x, y;
         switch (windowHeight){
             case 576:
-                x = (screenSize.width - 1024) / 2 + 1024 - 100;
-                y = (screenSize.height - 576) / 2 + 130;
+                x = windowLeftCoordinate + 1024 - 100;
+                y = windowTopCoordinate + 140;
                 break;
             case 720:
-                x = (screenSize.width - 1280) / 2 + 1280 - 115;
-                y = (screenSize.height - 720) / 2 + 160;
+                x = windowLeftCoordinate + 1280 - 115;
+                y = windowTopCoordinate + 180;
                 break;
             case 900:
-                x = (screenSize.width - 1600) / 2 + 1600 - 160;
-                y = (screenSize.height - 900) / 2 + 230;
+                x = windowLeftCoordinate + 1600 - 160;
+                y = windowTopCoordinate + 230;
                 break;
             default:
                 x = 0;

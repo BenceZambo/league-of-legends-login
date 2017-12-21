@@ -1,12 +1,9 @@
 package logger;
 
 import com.sun.jna.Native;
-import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.ptr.PointerByReference;
-
-import java.util.concurrent.TimeUnit;
 
 public class AccessWindow {
     private static final int MAX_TITLE_LENGTH = 1024;

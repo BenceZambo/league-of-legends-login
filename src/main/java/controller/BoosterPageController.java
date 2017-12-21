@@ -1,8 +1,6 @@
 package controller;
 
 import com.google.gson.Gson;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef;
 import environment.AccessWindow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,20 +17,15 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import logger.Globals;
-import model.Server;
+import model.Order;
 import model.User;
 import view.AlertBox;
-import view.Loginer;
-import model.Order;
 import webService.HttpHandler;
 
-import javax.xml.bind.annotation.XmlElementDecl;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class BoosterPageController implements Initializable {
