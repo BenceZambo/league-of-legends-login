@@ -11,10 +11,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.User;
+import services.OrderService;
 import view.AlertBox;
 import webService.HttpHandler;
+import webService.WebSocketClient;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
@@ -49,7 +53,14 @@ public class LoginController implements Initializable{
         if(token != null) {
             Gson gson = new Gson();
             User user = gson.fromJson(token, User.class);
-            BoosterPageController boosterPageController = new BoosterPageController(user);
+            WebSocketClient webSocketClient = null;
+            OrderService orderService = new OrderService();
+            try {
+                webSocketClient = new WebSocketClient( new URI("https://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com"));
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+            BoosterPageController boosterPageController = new BoosterPageController(user, webSocketClient, orderService);
             FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/BoosterPage.fxml"));
             loginXML.setController(boosterPageController);
             Parent root = loginXML.load();

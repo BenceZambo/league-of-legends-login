@@ -18,9 +18,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import logger.Globals;
 import model.Order;
+import model.Status;
 import model.User;
+import services.OrderService;
 import view.AlertBox;
 import webService.HttpHandler;
+import webService.WebSocketClient;
 
 import java.awt.*;
 import java.io.IOException;
@@ -30,6 +33,8 @@ import java.util.ResourceBundle;
 
 public class BoosterPageController implements Initializable {
     User user;
+    WebSocketClient webSocketClient;
+    OrderService orderService;
     @FXML
     Button signOut;
     @FXML
@@ -45,8 +50,10 @@ public class BoosterPageController implements Initializable {
     @FXML
     private TableColumn<Order, String> status_column;
 
-    public BoosterPageController(User user) {
+    public BoosterPageController(User user, WebSocketClient webSocketClient, OrderService orderService) {
+        this.orderService = orderService;
         this.user = user;
+        this.webSocketClient = webSocketClient;
     }
 
     @FXML
@@ -62,15 +69,19 @@ public class BoosterPageController implements Initializable {
         System.out.println(username);
         System.out.println(password);
 
-        if (accessWindow.checkIfRunning(Globals.lolClient)){
+        if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING){
             AutoLoginer autoLoginer = new AutoLoginer();
             try {
                 autoLoginer.logMeIn(username, password);
             } catch (AWTException e) {
                 AlertBox.display("Login fail", "Can't login");
             }
-        } else {
+        }
+        if (!accessWindow.checkIfRunning(Globals.lolClient)){
             AlertBox.display("Client does not run", "Please run the League of Legends client");
+        }
+        if (orderSelected.getStatus() == Status.PAUSED){
+            AlertBox.display("Order paused", "This order is paused, you cannot boost on this");
         }
     }
 
@@ -95,12 +106,13 @@ public class BoosterPageController implements Initializable {
         ObservableList<Order> products = FXCollections.observableArrayList();
         String response = "";
         try {
-            response = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/order/getOrders", urlParameters);
+            response = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/order/getOrdersApp", urlParameters);
         } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println(response);
         Order[] postResponse = gson.fromJson(response, Order[].class);
+        orderService.setArrayOfOrders(postResponse);
         for (int i = 0; i < postResponse.length; i++) {
             products.add(postResponse[i]);
         }
