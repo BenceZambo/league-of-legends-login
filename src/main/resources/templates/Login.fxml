@@ -30,7 +30,7 @@
                   <Insets top="130.0" />
                </VBox.margin>
             </Region>
-            <TextField fx:id="username" prefHeight="40.0" prefWidth="250.0" promptText="username" style="-fx-background-color: skyblue; -fx-border-color: black; -fx-font-size: 25;">
+            <TextField fx:id="username" prefHeight="40.0" prefWidth="250.0" promptText="email" style="-fx-background-color: skyblue; -fx-border-color: black; -fx-font-size: 25;">
                <VBox.margin>
                   <Insets left="25.0" right="25.0" />
                </VBox.margin>

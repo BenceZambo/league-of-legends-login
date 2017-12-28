@@ -22,8 +22,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LoginController implements Initializable{
+    private Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+    private Matcher matcher;
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     @FXML
     TextField password, username;
 
@@ -32,45 +39,52 @@ public class LoginController implements Initializable{
 
     @FXML
     public void handleLoginButton(javafx.event.ActionEvent event) throws IOException {
-        HttpHandler httpHandler = new HttpHandler();
-        LinkedHashMap<String,String> urlParameters = new LinkedHashMap();
+        if (validate(username.getText())) {
+            HttpHandler httpHandler = new HttpHandler();
+            LinkedHashMap<String, String> urlParameters = new LinkedHashMap();
 
-        String username = this.username.getText();
-        String password = this.password.getText();
+            String username = this.username.getText();
+            String password = this.password.getText();
 
-        urlParameters.put("email", username);
-        urlParameters.put("password", password);
+            urlParameters.put("email", username);
+            urlParameters.put("password", password);
+            urlParameters.put("applogin", "true");
 
-        String token;
-        try {
-            token = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/auth/login", urlParameters);
-            System.out.println(token);
-        } catch (Exception e1) {
-            token = null;
-        }
-
-
-        if(token != null) {
-            Gson gson = new Gson();
-            User user = gson.fromJson(token, User.class);
-            WebSocketClient webSocketClient = null;
-            OrderService orderService = new OrderService();
+            String token;
             try {
-                webSocketClient = new WebSocketClient( new URI("https://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com"));
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
+                token = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/auth/login", urlParameters);
+                System.out.println(token);
+            } catch (Exception e1) {
+                token = null;
             }
-            BoosterPageController boosterPageController = new BoosterPageController(user, webSocketClient, orderService);
-            FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/BoosterPage.fxml"));
-            loginXML.setController(boosterPageController);
-            Parent root = loginXML.load();
-            Scene scene = new Scene(root);
-            Node node=(Node) event.getSource();
-            Stage stage=(Stage) node.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
+
+            //sRyMAN4/3
+            if (token != null) {
+
+                Gson gson = new Gson();
+                User user = gson.fromJson(token, User.class);
+                WebSocketClient webSocketClient = null;
+                OrderService orderService = new OrderService();
+                try {
+                    webSocketClient = new WebSocketClient(orderService, new URI("https://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com"));
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+
+                BoosterPageController boosterPageController = new BoosterPageController(user, webSocketClient, orderService);
+                FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/BoosterPage.fxml"));
+                loginXML.setController(boosterPageController);
+                Parent root = loginXML.load();
+                Scene scene = new Scene(root);
+                Node node = (Node) event.getSource();
+                Stage stage = (Stage) node.getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            } else {
+                AlertBox.display("Alert", "Invalid username, or password!");
+            }
         }else{
-            AlertBox.display("Alert", "Invalid username, or password!");
+            AlertBox.display("Alert", "Invalid email address");
         }
     }
 
@@ -83,5 +97,12 @@ public class LoginController implements Initializable{
                 e.printStackTrace();
             }
         });
+    }
+
+    public boolean validate(final String hex) {
+
+        matcher = pattern.matcher(hex);
+        return matcher.matches();
+
     }
 }

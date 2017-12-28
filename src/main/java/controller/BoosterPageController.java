@@ -72,6 +72,7 @@ public class BoosterPageController implements Initializable {
         if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING){
             AutoLoginer autoLoginer = new AutoLoginer();
             try {
+                //TODO websocket send order login to server
                 autoLoginer.logMeIn(username, password);
             } catch (AWTException e) {
                 AlertBox.display("Login fail", "Can't login");

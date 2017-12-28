@@ -12,20 +12,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.websocket:javax.websocket-api:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.tyrus:tyrus-client:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.tyrus:tyrus-core:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.tyrus:tyrus-spi:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.tyrus:tyrus-websocket-core:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.tyrus:tyrus-container-grizzly:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.grizzly:grizzly-framework:2.3.3" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.grizzly:grizzly-http-server:2.3.3" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.grizzly:grizzly-http:2.3.3" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.grizzly:grizzly-rcm:2.3.3" level="project" />
     <orderEntry type="library" name="Maven: javax.json:javax.json-api:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: javax.websocket:javax.websocket-client-api:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.tyrus.bundles:tyrus-standalone-client:1.12" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.tyrus:tyrus-container-grizzly-client:1.12" level="project" />
     <orderEntry type="library" name="Maven: com.auth0:java-jwt:3.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.2" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.0" level="project" />
@@ -141,5 +129,6 @@
     <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.8.1" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.13.0" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20090211" level="project" />
+    <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt:0.9.0" level="project" />
   </component>
 </module>
