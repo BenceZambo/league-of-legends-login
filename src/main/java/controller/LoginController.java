@@ -1,6 +1,12 @@
 package controller;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -10,7 +16,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import jdk.nashorn.internal.parser.JSONParser;
 import model.User;
+import org.json.JSONObject;
 import services.OrderService;
 import view.AlertBox;
 import webService.HttpHandler;
@@ -51,18 +59,31 @@ public class LoginController implements Initializable{
             urlParameters.put("applogin", "true");
 
             String token;
+            String JSONToken;
             try {
-                token = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/auth/login", urlParameters);
-                System.out.println(token);
+                JSONToken = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/auth/login", urlParameters);
+                JsonObject jsonObject = (new JsonParser()).parse(JSONToken).getAsJsonObject();
+                token = jsonObject.get("token").toString();
             } catch (Exception e1) {
                 token = null;
+                JSONToken = null;
             }
 
             //sRyMAN4/3
+            System.out.println(token);
             if (token != null) {
 
                 Gson gson = new Gson();
-                User user = gson.fromJson(token, User.class);
+                User user = gson.fromJson(JSONToken, User.class);
+
+                try {
+                    DecodedJWT jwt = JWT.decode(token);
+                    user.setId(jwt.getClaims().get("user").asInt());
+                } catch (JWTDecodeException exception){
+                    //Invalid token
+                }
+                System.out.println(user.getId());
+
                 WebSocketClient webSocketClient = null;
                 OrderService orderService = new OrderService();
                 try {

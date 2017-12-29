@@ -20,6 +20,8 @@ import logger.Globals;
 import model.Order;
 import model.Status;
 import model.User;
+import org.json.JSONException;
+import org.json.JSONObject;
 import services.OrderService;
 import view.AlertBox;
 import webService.HttpHandler;
@@ -50,7 +52,8 @@ public class BoosterPageController implements Initializable {
     @FXML
     private TableColumn<Order, String> status_column;
 
-    public BoosterPageController(User user, WebSocketClient webSocketClient, OrderService orderService) {
+    public BoosterPageController(User user, WebSocketClient webSocketClient,
+                                 OrderService orderService) {
         this.orderService = orderService;
         this.user = user;
         this.webSocketClient = webSocketClient;
@@ -69,13 +72,25 @@ public class BoosterPageController implements Initializable {
         System.out.println(username);
         System.out.println(password);
 
+        /*orderNotification, { type: 'login VAGY logout', id: 'order id itt', to: 'customer_id (ezt is elküldöm orderekkel együtt)' }
+        ja és a küldésnél a customer_id-t azt arrayba küld
+        Áron Liptai*/
+
+
         if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING){
             AutoLoginer autoLoginer = new AutoLoginer();
             try {
                 //TODO websocket send order login to server
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("type", "login");
+                jsonObject.put("id", orderSelected.getId());
+                jsonObject.put("customer_id", orderSelected.getCustomer_id());
+                webSocketClient.send("orderNotification", jsonObject);
                 autoLoginer.logMeIn(username, password);
             } catch (AWTException e) {
                 AlertBox.display("Login fail", "Can't login");
+            }catch (JSONException e){
+                System.out.println(e);
             }
         }
         if (!accessWindow.checkIfRunning(Globals.lolClient)){

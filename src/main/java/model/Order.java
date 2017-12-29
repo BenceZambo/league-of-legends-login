@@ -4,13 +4,15 @@ public class Order {
     String purchase;
     String loginname;
     String loginpassword;
+
+    Integer customer_id;
+
     Integer id;
+
     Status status;
     Server server;
-
     public Order() {
     }
-
     public String getPurchase() {
         return purchase;
     }
@@ -57,5 +59,13 @@ public class Order {
 
     public void setServer(Server server) {
         this.server = server;
+    }
+
+    public Integer getCustomer_id() {
+        return customer_id;
+    }
+
+    public void setCustomer_id(Integer customer_id) {
+        this.customer_id = customer_id;
     }
 }
