@@ -93,6 +93,7 @@ public class LoginController implements Initializable{
                 }
 
                 BoosterPageController boosterPageController = new BoosterPageController(user, webSocketClient, orderService);
+                webSocketClient.setBoosterPageController(boosterPageController);
                 FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/BoosterPage.fxml"));
                 loginXML.setController(boosterPageController);
                 Parent root = loginXML.load();

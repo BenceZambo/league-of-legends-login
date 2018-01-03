@@ -1,13 +1,16 @@
 package webService;
 
+import controller.BoosterPageController;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import logger.Globals;
 import model.Order;
 import model.Status;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.OrderService;
+import services.WindowWatcher;
 import view.AlertBox;
 
 import java.net.URI;
@@ -16,6 +19,9 @@ import java.net.URISyntaxException;
 public class WebSocketClient {
     io.socket.client.Socket socket;
     OrderService orderService;
+
+    BoosterPageController boosterPageController;
+
     public void joinServer(URI address) {
         {
             try {
@@ -24,7 +30,7 @@ public class WebSocketClient {
 
                     @Override
                     public void call(Object... args) {
-                        socket.emit("", "hi");
+                        socket.emit("", "");
                         socket.disconnect();
                     }
 
@@ -38,16 +44,14 @@ public class WebSocketClient {
                             type = obj.getString("type");
                             int id = obj.getInt("id");
                             Order order = orderService.findByID(id);
+                            boosterPageController.initData();
                             switch (type) {
                                 case "pause":
-                                    order.setStatus(Status.PAUSED);
-                                    AlertBox.display("Your order paused", "Your order paused");
-                                    //TODO
+                                    //WindowWatcher windowWatcher = new WindowWatcher(Globals.lolGame);
+                                    AlertBox.display("Your order paused", "Your order (" + id + ") has benn paused");
                                     break;
                                 case "unpause":
-                                    order.setStatus(Status.PROCESSING);
-                                    AlertBox.display("Your order is processing now", "Your order is processing now");
-                                    //TODO
+                                    AlertBox.display("Your order is processing now", "Your order (" + id + ") is processing now");
                                     break;
                             }
                         } catch (JSONException e) {
@@ -76,5 +80,13 @@ public class WebSocketClient {
 
     public void send(String key, Object object){
         socket.emit(key, object);
+    }
+
+    public void disconnect(){
+        socket.disconnect();
+    }
+
+    public void setBoosterPageController(BoosterPageController boosterPageController) {
+        this.boosterPageController = boosterPageController;
     }
 }
