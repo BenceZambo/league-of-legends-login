@@ -84,14 +84,12 @@ public class LoginController implements Initializable{
 
                 WebSocketClient webSocketClient = null;
                 try {
-                    webSocketClient = new WebSocketClient(new URI("https://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com"));
+                    webSocketClient = new WebSocketClient(new URI("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com"));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
 
                 OrderService orderService = new OrderService();
-                webSocketClient.setOrderService(orderService);
-                webSocketClient.setUser(user);
 
                 BoosterPageController boosterPageController = new BoosterPageController(user, webSocketClient, orderService);
                 webSocketClient.setBoosterPageController(boosterPageController);

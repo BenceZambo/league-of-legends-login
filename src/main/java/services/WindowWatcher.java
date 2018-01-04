@@ -6,30 +6,18 @@ import logger.Globals;
 
 import java.io.IOException;
 
-public class WindowWatcher {
-
-    public WindowWatcher(String watchableWindow) {
-        if (watchableWindow == Globals.lolGame){
-            watchGame();
-        }else{
-            watchClient();
-        }
-    }
-
-    private void watchClient() {
-        boolean isWatchableWindowThere;
-        AccessWindow accessWindow = new AccessWindow();
-        isWatchableWindowThere = accessWindow.checkIfRunning(Globals.lolClient);
-        while (isWatchableWindowThere){
-            isWatchableWindowThere = accessWindow.checkIfRunning(Globals.lolClient);
-        }
-    }
+public class WindowWatcher implements Runnable {
 
     private void watchGame(){
         boolean isWatchableWindowThere;
         AccessWindow accessWindow = new AccessWindow();
         isWatchableWindowThere = accessWindow.checkIfRunning(Globals.lolGame);
         while (isWatchableWindowThere){
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             isWatchableWindowThere = accessWindow.checkIfRunning(Globals.lolGame);
         }
         try {
@@ -37,5 +25,10 @@ public class WindowWatcher {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void run() {
+        watchGame();
     }
 }

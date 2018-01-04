@@ -1,14 +1,14 @@
 package webService;
 
 import controller.BoosterPageController;
+import environment.AccessWindow;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import model.Order;
-import model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
-import services.OrderService;
+import services.WindowWatcher;
 import view.AlertBox;
 
 import java.net.URI;
@@ -16,11 +16,8 @@ import java.net.URI;
 public class WebSocketClient {
     io.socket.client.Socket socket;
 
-    OrderService orderService;
-
     BoosterPageController boosterPageController;
 
-    User user;
 
     public void joinServer(URI address) {
             try {
@@ -37,15 +34,20 @@ public class WebSocketClient {
                     @Override
                     public void call(Object... args) {
                         JSONObject obj = (JSONObject) args[0];
+                        System.out.println(obj.toString());
                         try {
-                            Integer[] boosterID =(Integer[]) obj.get("to");
-                            if (boosterID[0] == user.getId()) {
-                                String type = obj.getString("type");
-                                int id = obj.getInt("id");
-                                Order order = boosterPageController.getCurrentOrder();
-                                if (order.getId() == id && type == "pause") {
-                                    AlertBox.display("WARNING", "Order has been paused, please sign out!");
-                                }
+                            String type = obj.getString("type");
+                            int id = obj.getInt("id");
+                            Order order = boosterPageController.getCurrentOrder();
+                            System.out.println(order.getId());
+                            if (order.getId() == id && type == "pause") {
+                                AlertBox.display("WARNING", "Order has been paused, please sign out!");
+                                System.out.println("WARNING");
+                                boosterPageController.initData();
+                                Thread thread = new Thread(new WindowWatcher());
+                                thread.run();
+                            }
+                            if (type == "unpause") {
                                 boosterPageController.initData();
                             }
                         } catch (JSONException e) {
@@ -86,14 +88,5 @@ public class WebSocketClient {
 
     public void setBoosterPageController(BoosterPageController boosterPageController) {
         this.boosterPageController = boosterPageController;
-    }
-
-
-    public void setOrderService(OrderService orderService) {
-        this.orderService = orderService;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }
