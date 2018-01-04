@@ -204,4 +204,8 @@ public class BoosterPageController implements Initializable {
             webSocketClient = null;
         });
     }
+
+    public Order getCurrentOrder(){
+        return currentOrder;
+    }
 }

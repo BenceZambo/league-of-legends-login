@@ -91,6 +91,7 @@ public class LoginController implements Initializable{
 
                 OrderService orderService = new OrderService();
                 webSocketClient.setOrderService(orderService);
+                webSocketClient.setUser(user);
 
                 BoosterPageController boosterPageController = new BoosterPageController(user, webSocketClient, orderService);
                 webSocketClient.setBoosterPageController(boosterPageController);

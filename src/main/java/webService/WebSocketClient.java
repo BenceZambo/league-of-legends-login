@@ -5,6 +5,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import model.Order;
+import model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.OrderService;
@@ -19,16 +20,16 @@ public class WebSocketClient {
 
     BoosterPageController boosterPageController;
 
+    User user;
+
     public void joinServer(URI address) {
-        {
             try {
                 socket = IO.socket(address);
                 socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 
                     @Override
                     public void call(Object... args) {
-                        socket.emit("", "");
-                        socket.disconnect();
+                        System.out.println("connected");
                     }
 
                 }).on("orderNotification", new Emitter.Listener() {
@@ -36,20 +37,16 @@ public class WebSocketClient {
                     @Override
                     public void call(Object... args) {
                         JSONObject obj = (JSONObject) args[0];
-                        String type;
                         try {
-                            type = obj.getString("type");
-                            int id = obj.getInt("id");
-                            Order order = orderService.findByID(id);
-                            boosterPageController.initData();
-                            switch (type) {
-                                case "pause":
-                                    //WindowWatcher windowWatcher = new WindowWatcher(Globals.lolGame);
-                                    AlertBox.display("Your order paused", "Your order (" + id + ") has benn paused");
-                                    break;
-                                case "unpause":
-                                    AlertBox.display("Your order is processing now", "Your order (" + id + ") is processing now");
-                                    break;
+                            Integer[] boosterID =(Integer[]) obj.get("to");
+                            if (boosterID[0] == user.getId()) {
+                                String type = obj.getString("type");
+                                int id = obj.getInt("id");
+                                Order order = boosterPageController.getCurrentOrder();
+                                if (order.getId() == id && type == "pause") {
+                                    AlertBox.display("WARNING", "Order has been paused, please sign out!");
+                                }
+                                boosterPageController.initData();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -60,18 +57,22 @@ public class WebSocketClient {
 
                     @Override
                     public void call(Object... args) {
+                        System.out.println("disconnect");
                     }
 
-                });
+                }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+                            @Override
+                            public void call(Object... args) {
+                                System.out.println("Failed to connect");
+                            }
+                        });
                 socket.connect();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
     }
 
     public WebSocketClient(URI address) {
-        this.orderService = orderService;
         joinServer(address);
     }
 
@@ -90,5 +91,9 @@ public class WebSocketClient {
 
     public void setOrderService(OrderService orderService) {
         this.orderService = orderService;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
