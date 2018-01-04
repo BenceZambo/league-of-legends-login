@@ -70,7 +70,6 @@ public class LoginController implements Initializable{
             }
 
             //sRyMAN4/3
-            System.out.println(token);
             if (token != null) {
 
                 Gson gson = new Gson();
@@ -82,15 +81,16 @@ public class LoginController implements Initializable{
                 } catch (JWTDecodeException exception){
                     //Invalid token
                 }
-                System.out.println(user.getId());
 
                 WebSocketClient webSocketClient = null;
-                OrderService orderService = new OrderService();
                 try {
-                    webSocketClient = new WebSocketClient(orderService, new URI("https://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com"));
+                    webSocketClient = new WebSocketClient(new URI("https://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com"));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
+
+                OrderService orderService = new OrderService();
+                webSocketClient.setOrderService(orderService);
 
                 BoosterPageController boosterPageController = new BoosterPageController(user, webSocketClient, orderService);
                 webSocketClient.setBoosterPageController(boosterPageController);

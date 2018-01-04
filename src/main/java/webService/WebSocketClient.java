@@ -4,20 +4,17 @@ import controller.BoosterPageController;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-import logger.Globals;
 import model.Order;
-import model.Status;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.OrderService;
-import services.WindowWatcher;
 import view.AlertBox;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class WebSocketClient {
     io.socket.client.Socket socket;
+
     OrderService orderService;
 
     BoosterPageController boosterPageController;
@@ -73,7 +70,7 @@ public class WebSocketClient {
         }
     }
 
-    public WebSocketClient(OrderService orderService, URI address) {
+    public WebSocketClient(URI address) {
         this.orderService = orderService;
         joinServer(address);
     }
@@ -88,5 +85,10 @@ public class WebSocketClient {
 
     public void setBoosterPageController(BoosterPageController boosterPageController) {
         this.boosterPageController = boosterPageController;
+    }
+
+
+    public void setOrderService(OrderService orderService) {
+        this.orderService = orderService;
     }
 }

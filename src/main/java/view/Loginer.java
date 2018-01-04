@@ -15,8 +15,11 @@ import logger.LolClientLogger;
 import logger.LolGameLogger;
 import org.jnativehook.NativeHookException;
 import webService.AWSWebService;
+import webService.WebSocketClient;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class Loginer extends javafx.application.Application {
     //public static String boosterName = "Barney";
@@ -50,6 +53,7 @@ public class Loginer extends javafx.application.Application {
                 }
             }
         });*/
+
         LoginController loginController = new LoginController();
         primaryStage.setTitle("BoostRoyal");
         FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));
@@ -62,6 +66,15 @@ public class Loginer extends javafx.application.Application {
         //lolGameLogger.turnOn();
         //lolClientLogger.turnOn();
     }
+
+    @Override
+    public void stop() throws Exception {
+        System.out.println("Ez a loginerből volt");
+        Platform.exit();
+        System.exit(0);
+        super.stop();
+    }
+
 
     /*private void uploadLog() {
         try {

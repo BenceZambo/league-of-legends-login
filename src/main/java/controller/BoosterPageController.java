@@ -23,7 +23,6 @@ import model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.OrderService;
-import services.WindowWatcher;
 import view.AlertBox;
 import webService.HttpHandler;
 import webService.WebSocketClient;
@@ -38,6 +37,9 @@ public class BoosterPageController implements Initializable {
     User user;
     WebSocketClient webSocketClient;
     OrderService orderService;
+    boolean loggedIn = false;
+    boolean closeMethodSet = false;
+    Order currentOrder;
     @FXML
     Button signOut;
     @FXML
@@ -82,31 +84,27 @@ public class BoosterPageController implements Initializable {
             AutoLoginer autoLoginer = new AutoLoginer();
             try {
                 //TODO websocket send order login to server
-                JSONObject loginJsonObject = new JSONObject();
-                loginJsonObject.put("type", "login");
-                loginJsonObject.put("id", orderSelected.getId());
-                loginJsonObject.put("to", orderSelected.getCustomer_id());
-                webSocketClient.send("orderNotification", loginJsonObject);
-                System.out.println("websocket sent");
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if (loggedIn){
+                    JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
+                    webSocketClient.send("orderNotification", logoutJsonObject);
+                    System.out.println("logout websocket message sent" + logoutJsonObject.toString());
                 }
-                autoLoginer.logMeIn(username, password);
-                WindowWatcher windowWatcher = new WindowWatcher(Globals.lolClient);
-                System.out.println("window watcher destroyed");
+                JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, orderSelected);
+                webSocketClient.send("orderNotification", loginJsonObject);
+                System.out.println("login websocket sent" + loginJsonObject.toString());
+                currentOrder = orderSelected;
+                loggedIn = true;
+                if (closeMethodSet == false){
+                    setClose();
+                    closeMethodSet = true;
+                }
 
-                JSONObject logoutJsonObject = new JSONObject();
-                logoutJsonObject.put("type", "logout");
-                logoutJsonObject.put("id", orderSelected.getId());
-                logoutJsonObject.put("to", orderSelected.getCustomer_id());
-                webSocketClient.send("orderNotification", logoutJsonObject);
-                System.out.println("websocket message sent");
+                autoLoginer.logMeIn(username, password);
+
+                //WindowWatcher windowWatcher = new WindowWatcher(Globals.lolClient);
+                //System.out.println("window watcher destroyed");
             } catch (AWTException e) {
                 AlertBox.display("Login fail", "Can't login");
-            }catch (JSONException e){
-                System.out.println(e);
             }
         }
         if (!accessWindow.checkIfRunning(Globals.lolClient)){
@@ -119,8 +117,8 @@ public class BoosterPageController implements Initializable {
 
     @FXML
     public void signoutButtonHandler(ActionEvent event) throws IOException {
-        initData();
-        /*LoginController loginController = new LoginController();
+        webSocketClient.disconnect();
+        LoginController loginController = new LoginController();
         FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));
         loginXML.setController(loginController);
         Parent root = loginXML.load();
@@ -129,7 +127,6 @@ public class BoosterPageController implements Initializable {
         Stage stage=(Stage) node.getScene().getWindow();
         stage.setScene(scene);
         stage.show();
-        webSocketClient.disconnect();*/
     }
 
     public void initData() {
@@ -173,4 +170,38 @@ public class BoosterPageController implements Initializable {
         initData();
     }
 
+    public JSONObject getLogInJSON(JSONType jsonType, Order order){
+        JSONObject loginJsonObject = new JSONObject();
+        Integer[] to = new Integer[1];
+        to[0] = order.getCustomer_id();
+        try {
+            loginJsonObject.put("to", to);
+            loginJsonObject.put("id", order.getId());
+            if (jsonType == JSONType.LOGIN) {
+                loginJsonObject.put("type", "login");
+            }else {
+                loginJsonObject.put("type", "logout");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return loginJsonObject;
+    }
+
+    private enum JSONType{
+        LOGIN, LOGOUT
+    }
+
+    private void setClose(){
+        Stage stage = (Stage) signOut.getScene().getWindow();
+        stage.setOnCloseRequest(event -> {
+            if (loggedIn){
+                JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
+                webSocketClient.send("orderNotification", logoutJsonObject);
+                System.out.println("websocket message sent" + "habhahahaha");
+            }
+            webSocketClient.disconnect();
+            webSocketClient = null;
+        });
+    }
 }
