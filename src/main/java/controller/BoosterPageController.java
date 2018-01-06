@@ -74,7 +74,7 @@ public class BoosterPageController implements Initializable {
 
         /*orderNotification, { type: 'login VAGY logout', id: 'order id itt', to: 'customer_id (ezt is elküldöm orderekkel együtt)' }
         ja és a küldésnél a customer_id-t azt arrayba küld
-        Áron Liptai*/
+        Aron Liptai*/
 
 
         if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING){
