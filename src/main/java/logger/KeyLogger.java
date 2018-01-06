@@ -4,7 +4,6 @@ import environment.AccessWindow;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
-import view.AlertBox;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -14,9 +13,9 @@ import java.util.Scanner;
 
 public abstract class KeyLogger {
 
-    private String badWordsFilePath = "/src/main/java/logger/BadWords.csv";
-    String filePath = "/src/main/java/logger/logs/" + getCurrentTime() + ".csv";
-    String warningFilePath = "/src/main/java/logger/logs/" + "WARNING!_" + getCurrentTime() + ".csv";
+    private String badWordsFilePath = "src/main/java/logger/BadWords.csv";
+    String filePath = "src/main/java/logger/logs/" + getCurrentTime() + ".csv";
+    String warningFilePath = "src/main/java/logger/logs/" + "WARNING!_" + getCurrentTime() + ".csv";
 
     String fileName = getCurrentTime() + ".csv";
     String warningFileName = "WARNING!_" + getCurrentTime() + ".csv";
@@ -39,17 +38,17 @@ public abstract class KeyLogger {
 
     void saveMessage() throws IOException {
         if(checkForBadWords(message)) {
-//            File oldFile = new File(filePath);
-//            filePath = warningFilePath;
-//            fileName = warningFileName;
-//            File newFile = new File(warningFilePath);
-//            if(oldFile.renameTo(newFile)){
-//                System.out.println("Rename succesful");
-//            }else{
-//                System.out.println("Rename failed");
-//            }
+            File oldFile = new File(filePath);
+            filePath = warningFilePath;
+            fileName = warningFileName;
+            File newFile = new File(warningFilePath);
+            if(oldFile.renameTo(newFile)){
+                System.out.println("Rename succesful");
+            }else{
+                System.out.println("Rename failed");
+            }
         }
-//        writeToFile(filePath);
+        writeToFile(filePath);
     }
 
 
@@ -76,7 +75,6 @@ public abstract class KeyLogger {
             System.out.println(message);
             System.out.println("Message saved sucsessfully");
             setDefaults();
-            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -100,13 +98,8 @@ public abstract class KeyLogger {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        if(scanner != null) {
-            while (scanner.hasNext()) {
-                AlertBox.display("ASD", scanner.nextLine());
-                badWords.add(scanner.nextLine());
-                System.out.println(scanner.nextLine());
-            }
-            scanner.close();
+        while (scanner.hasNext()) {
+            badWords.add(scanner.nextLine());
         }
         return badWords;
     }
