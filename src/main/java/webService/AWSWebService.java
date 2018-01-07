@@ -7,42 +7,39 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import logger.KeyLogger;
-import logger.LolGameLogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class AWSWebService {
 
-    private final String bucketName = "booostroyaltest";
-    private final String basePath = System.getProperty("user.dir");
-    private static final String accessKey = "AKIAJE2FNQ3UUWY7IELQ";
-    private static final String secretKey = "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";
-
-    private String keyName;
-    private String uploadFileName;
+    public static String bucketName;
+    public static String basePath = System.getProperty("user.dir");
+    public static String accessKey;
+    public static String secretKey;
+    public static String folder;
 
 
-    public AWSWebService(String uploadFileName, String keyName)
-    {
-        this.uploadFileName =  basePath + "/" + uploadFileName;
-        this.keyName = keyName + "/" + LolGameLogger.getInstance().getFileName();
+
+
+    public AWSWebService() {
     }
 
     public static AWSCredentials createAWSCredentials(){
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        return credentials;
+        return new BasicAWSCredentials(accessKey, secretKey);
     }
 
-    public void WebService() throws IOException {
+    public void WebService(File uploadFile, String keyName) throws IOException {
         AmazonS3 s3client = new AmazonS3Client(createAWSCredentials());
-
         try {
             System.out.println("Uploading a new object to S3 from a file\n");
-            File file = new File(uploadFileName);
+            System.out.println(bucketName);
+            System.out.println(keyName);
+            System.out.println(uploadFile);
             s3client.putObject(new PutObjectRequest(
-                    bucketName, keyName, file));
+                    bucketName, keyName, uploadFile));
         } catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which " +
                     "means your request made it " +
