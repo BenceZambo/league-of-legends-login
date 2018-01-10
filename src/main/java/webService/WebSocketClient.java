@@ -1,7 +1,6 @@
 package webService;
 
 import controller.BoosterPageController;
-import environment.AccessWindow;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -9,7 +8,6 @@ import model.Order;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.WindowWatcher;
-import view.AlertBox;
 
 import java.net.URI;
 
@@ -40,8 +38,7 @@ public class WebSocketClient {
                             int id = obj.getInt("id");
                             Order order = boosterPageController.getCurrentOrder();
                             System.out.println(order.getId());
-                            if (order.getId() == id && type == "pause") {
-                                AlertBox.display("WARNING", "Order has been paused, please sign out!");
+                            if (order.getId().equals(id) && type.equals("pause")) {
                                 System.out.println("WARNING");
                                 boosterPageController.initData();
                                 Thread thread = new Thread(new WindowWatcher());

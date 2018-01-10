@@ -14,14 +14,14 @@ public class WindowWatcher implements Runnable {
         isWatchableWindowThere = accessWindow.checkIfRunning(Globals.lolGame);
         while (isWatchableWindowThere){
             try {
-                Thread.sleep(10000);
+                Thread.sleep(15000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             isWatchableWindowThere = accessWindow.checkIfRunning(Globals.lolGame);
         }
         try {
-            TaskKiller.closeRunningClient(Globals.lolClient);
+            TaskKiller.closeRunningClient("LeagueClient.exe");
         } catch (IOException e) {
             e.printStackTrace();
         }
