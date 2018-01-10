@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.fxml.FXML;
@@ -16,14 +15,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import jdk.nashorn.internal.parser.JSONParser;
 import model.User;
-import org.json.JSONObject;
 import services.OrderService;
 import view.AlertBox;
 import webService.HttpHandler;
 import webService.WebSocketClient;
 
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,7 +43,6 @@ public class LoginController implements Initializable{
     @FXML
     Button login;
 
-    @FXML
     public void handleLoginButton(javafx.event.ActionEvent event) throws IOException {
         if (validate(username.getText())) {
             HttpHandler httpHandler = new HttpHandler();
@@ -102,16 +99,30 @@ public class LoginController implements Initializable{
                 stage.setScene(scene);
                 stage.show();
             } else {
-                AlertBox.display("Alert", "Invalid username, or password!");
+                AlertBox.display("Alert", "Invalid email, or password!");
             }
         }else{
-            AlertBox.display("Alert", "Invalid email address");
+            AlertBox.display("Alert", "Invalid email, or password!");
         }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         login.setOnAction(event -> {
+            try {
+                handleLoginButton(event);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        password.setOnAction(event -> {
+            try {
+                handleLoginButton(event);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        username.setOnAction(event -> {
             try {
                 handleLoginButton(event);
             } catch (IOException e) {
