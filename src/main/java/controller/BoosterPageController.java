@@ -2,6 +2,8 @@ package controller;
 
 import com.google.gson.Gson;
 import environment.AccessWindow;
+import environment.TaskKiller;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,21 +19,25 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import logger.Globals;
+import logger.KeyLogger;
+import logger.LolClientLogger;
+import logger.LolGameLogger;
 import model.Order;
 import model.Status;
 import model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.OrderService;
+import services.Utils;
 import view.AlertBox;
+import view.Loginer;
 import webService.HttpHandler;
 import webService.WebSocketClient;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class BoosterPageController implements Initializable {
     User user;
@@ -55,6 +61,12 @@ public class BoosterPageController implements Initializable {
     @FXML
     private TableColumn<Order, String> status_column;
 
+    private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
+    private LolClientLogger lolClientLogger = LolClientLogger.getInstance();
+    private Utils utils = new Utils();
+    private static Timer timer = new Timer();
+    AccessWindow accessWindow = new AccessWindow();
+
     public BoosterPageController(User user, WebSocketClient webSocketClient,
                                  OrderService orderService) {
         this.orderService = orderService;
@@ -65,7 +77,6 @@ public class BoosterPageController implements Initializable {
     @FXML
     public void launchButtonHandler() {
         Order orderSelected;
-        AccessWindow accessWindow = new AccessWindow();
 
         orderSelected = table.getSelectionModel().getSelectedItem();
 
@@ -84,25 +95,43 @@ public class BoosterPageController implements Initializable {
             AutoLoginer autoLoginer = new AutoLoginer();
             try {
                 //TODO websocket send order login to server
+
+                System.out.println(closeMethodSet);
+                if (closeMethodSet == false){
+                    setClose();
+                    lolGameLogger.turnOn();
+                    lolClientLogger.turnOn();
+                    closeMethodSet = true;
+                }
+
+                autoLoginer.logMeIn(username, password);
                 if (loggedIn){
                     JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
                     webSocketClient.send("orderNotification", logoutJsonObject);
                     System.out.println("logout websocket message sent" + logoutJsonObject.toString());
+                    if(KeyLogger.log.size() != 0) {
+                        utils.uploadLog(user, currentOrder);
+                    }
                 }
                 JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, orderSelected);
                 webSocketClient.send("orderNotification", loginJsonObject);
                 System.out.println("login websocket sent" + loginJsonObject.toString());
                 currentOrder = orderSelected;
                 loggedIn = true;
-                if (closeMethodSet == false){
-                    setClose();
-                    closeMethodSet = true;
-                }
 
-                autoLoginer.logMeIn(username, password);
 
-                //WindowWatcher windowWatcher = new WindowWatcher(Globals.lolClient);
-                //System.out.println("window watcher destroyed");
+                timer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        ArrayList<String> runningProcesses = TaskKiller.requestRunningProccesses();
+                        for (String process : runningProcesses) {
+                            if(process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
+                                utils.scriptAlert = true;
+                            }
+                        }
+                    }
+                }, 1000, 300000);
+
             } catch (AWTException e) {
                 AlertBox.display("Login fail", "Can't login");
             }
@@ -117,6 +146,7 @@ public class BoosterPageController implements Initializable {
 
     @FXML
     public void signoutButtonHandler(ActionEvent event) throws IOException {
+        if (!accessWindow.checkIfRunning(Globals.lolClient)){
         webSocketClient.disconnect();
         LoginController loginController = new LoginController();
         FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));
@@ -126,7 +156,14 @@ public class BoosterPageController implements Initializable {
         Node node=(Node) event.getSource();
         Stage stage=(Stage) node.getScene().getWindow();
         stage.setScene(scene);
-        stage.show();
+        stage.show();}
+        else {
+            AlertBox.display("Error", "Close the lol client.");
+        }
+        if(KeyLogger.log.size() != 0) {
+            utils.uploadLog(user, currentOrder);
+        }
+
     }
 
     public void initData() {
@@ -195,13 +232,25 @@ public class BoosterPageController implements Initializable {
     private void setClose(){
         Stage stage = (Stage) signOut.getScene().getWindow();
         stage.setOnCloseRequest(event -> {
-            if (loggedIn){
-                JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
-                webSocketClient.send("orderNotification", logoutJsonObject);
-                System.out.println("websocket message sent" + "habhahahaha");
+        if(accessWindow.checkIfRunning(Globals.lolClient)) {
+            AlertBox.display("Error", "Close the lol client.");
+            event.consume();
+        } else {
+                if (loggedIn){
+                    JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
+                    webSocketClient.send("orderNotification", logoutJsonObject);
+                    System.out.println("websocket message sent" + "habhahahaha");
+                }
+                webSocketClient.disconnect();
+                if(KeyLogger.log.size() != 0) {
+                    utils.uploadLog(user, currentOrder);
+                }
+                lolGameLogger.turnOff();
+                lolClientLogger.turnOff();
+                timer.cancel();
+                Platform.exit();
+                System.exit(0);
             }
-            webSocketClient.disconnect();
-            webSocketClient = null;
         });
     }
 

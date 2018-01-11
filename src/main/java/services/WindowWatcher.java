@@ -9,6 +9,7 @@ import java.io.IOException;
 public class WindowWatcher implements Runnable {
 
     private void watchGame(){
+        System.out.println("ttttttttttttttttttt");
         boolean isWatchableWindowThere;
         AccessWindow accessWindow = new AccessWindow();
         isWatchableWindowThere = accessWindow.checkIfRunning(Globals.lolGame);

@@ -1,6 +1,7 @@
 package view;
 
 import controller.LoginController;
+import environment.AccessWindow;
 import environment.TaskKiller;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -9,35 +10,50 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import environment.AccessWindow;
 import logger.Globals;
+import logger.KeyLogger;
 import logger.LolClientLogger;
 import logger.LolGameLogger;
 import org.jnativehook.NativeHookException;
+import org.json.JSONException;
+import org.json.JSONObject;
+import services.Utils;
 import webService.AWSWebService;
-import webService.WebSocketClient;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class Loginer extends javafx.application.Application {
-    //public static String boosterName = "Barney";
+    public static JSONObject current;
+    private static Timer timer = new Timer();
 
-    //private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
-    //private LolClientLogger lolClientLogger = LolClientLogger.getInstance();
+    private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
+    private LolClientLogger lolClientLogger = LolClientLogger.getInstance();
 
-    //private AccessWindow accessWindow = new AccessWindow();
+    private AccessWindow accessWindow = new AccessWindow();
 
-    //private boolean isLolClientRunning = true;
-    //private boolean isLolGameRunning = false;
+    private boolean isLolClientRunning = true;
+    private boolean isLolGameRunning = false;
+
+    public static boolean foundBadWord = false;
+    public static Boolean scriptAlert = false;
+
+    public Utils utils = new Utils();
 
     @Override
     public void start(Stage primaryStage) throws IOException, NativeHookException {
-        /*TaskKiller.requestRunningProccesses();
+        utils.readKeys();
+        //TaskKiller.requestRunningProccesses();
         Platform.setImplicitExit(false);
 
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+        /*primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
                 isLolClientRunning = accessWindow.checkIfRunning(Globals.lolClient);
@@ -47,13 +63,15 @@ public class Loginer extends javafx.application.Application {
                     event.consume();
                     AlertBox.display("You can't close me", "Sorry dude, you can not close me if lol is running.");
                 } else {
-                    uploadLog();
-                    lolGameLogger.turnOff();
-                    lolClientLogger.turnOff();
+                    Platform.exit();
                 }
             }
         });*/
 
+        startApplication(primaryStage);
+    }
+
+    private void startApplication(Stage primaryStage) throws IOException {
         LoginController loginController = new LoginController();
         primaryStage.setTitle("BoostRoyal");
         FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));
@@ -62,26 +80,15 @@ public class Loginer extends javafx.application.Application {
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
-
-        //lolGameLogger.turnOn();
-        //lolClientLogger.turnOn();
     }
 
     @Override
     public void stop() throws Exception {
         System.out.println("Ez a loginerből volt");
+        timer.cancel();
         Platform.exit();
         System.exit(0);
         super.stop();
     }
 
-
-    /*private void uploadLog() {
-        try {
-            AWSWebService webService =  new AWSWebService(lolClientLogger.getFilePath(), boosterName);
-            webService.WebService();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
 }

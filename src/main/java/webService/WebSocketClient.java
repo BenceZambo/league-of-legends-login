@@ -38,7 +38,7 @@ public class WebSocketClient {
                             int id = obj.getInt("id");
                             Order order = boosterPageController.getCurrentOrder();
                             System.out.println(order.getId());
-                            if (order.getId().equals(id) && type.equals("pause")) {
+                            if (order.getId().equals(15832) && type.equals("pause")) {
                                 System.out.println("WARNING");
                                 boosterPageController.initData();
                                 Thread thread = new Thread(new WindowWatcher());
