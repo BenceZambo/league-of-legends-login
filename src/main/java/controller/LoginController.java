@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import logger.Globals;
 import model.User;
 import services.OrderService;
 import view.AlertBox;
@@ -54,6 +55,7 @@ public class LoginController implements Initializable{
             urlParameters.put("email", username);
             urlParameters.put("password", password);
             urlParameters.put("applogin", "true");
+            urlParameters.put("version", Globals.Version);
 
             String token;
             String JSONToken;

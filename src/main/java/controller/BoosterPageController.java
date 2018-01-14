@@ -47,6 +47,8 @@ public class BoosterPageController implements Initializable {
     boolean closeMethodSet = false;
     Order currentOrder;
     @FXML
+    Button reFresh;
+    @FXML
     Button signOut;
     @FXML
     Button launchButton;
@@ -203,6 +205,8 @@ public class BoosterPageController implements Initializable {
                 e.printStackTrace();
             }
         });
+
+        reFresh.setOnAction(event -> initData());
 
         initData();
     }
