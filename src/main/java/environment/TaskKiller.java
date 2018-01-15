@@ -38,20 +38,23 @@ public class TaskKiller {
         return arrayList;
     }
 
-    public static void requestRunningProccesses() {
+    public static ArrayList<String> requestRunningProccesses() {
         try {
             final Process process = runtime.exec(requestProccessess);
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             ArrayList<String> arrayList = readProccesses(input);
+            System.out.println(arrayList);
             process.destroy();
 
-            for(String processName: arrayList){
+            /*for(String processName: arrayList){
                 closeRunningClient(processName);
-            }
+            }*/
+            return arrayList;
         }
         catch (Exception err) {
             err.printStackTrace();
+            return new ArrayList<String>();
         }
     }
 }

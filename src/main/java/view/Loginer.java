@@ -1,21 +1,38 @@
 package view;
 
+import controller.LoginController;
+import environment.AccessWindow;
 import environment.TaskKiller;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import environment.AccessWindow;
 import logger.Globals;
+import logger.KeyLogger;
 import logger.LolClientLogger;
 import logger.LolGameLogger;
 import org.jnativehook.NativeHookException;
+import org.json.JSONException;
+import org.json.JSONObject;
+import services.Utils;
 import webService.AWSWebService;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class Loginer extends javafx.application.Application {
-    public static String boosterName = "Barney";
+    public static JSONObject current;
+    private static Timer timer = new Timer();
 
     private LolGameLogger lolGameLogger = LolGameLogger.getInstance();
     private LolClientLogger lolClientLogger = LolClientLogger.getInstance();
@@ -25,48 +42,35 @@ public class Loginer extends javafx.application.Application {
     private boolean isLolClientRunning = true;
     private boolean isLolGameRunning = false;
 
-    private static String token;
+    public static boolean foundBadWord = false;
+    public static Boolean scriptAlert = false;
+
+    public Utils utils = new Utils();
 
     @Override
     public void start(Stage primaryStage) throws IOException, NativeHookException {
-        TaskKiller.requestRunningProccesses();
-        primaryStage.setTitle("Booster view.Loginer");
-        Platform.setImplicitExit(false);
+        utils.readKeys();
 
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                isLolClientRunning = accessWindow.checkIfRunning(Globals.lolClient);
-                isLolGameRunning = accessWindow.checkIfRunning(Globals.lolGame);
-
-                if(isLolGameRunning || isLolClientRunning) {
-                    event.consume();
-                    AlertBox.display("You can't close me", "Sorry dude, you can not close me if lol is running.");
-                } else {
-                    uploadLog();
-                    lolGameLogger.turnOff();
-                    lolClientLogger.turnOff();
-                }
-            }
-        });
-        Login loginWindow = new Login();
-
-        loginWindow.createLoginWindow(primaryStage);
-
-        lolGameLogger.turnOn();
-        lolClientLogger.turnOn();
+        startApplication(primaryStage);
     }
 
-    private void uploadLog() {
-        try {
-            AWSWebService webService =  new AWSWebService(lolClientLogger.getFilePath(), boosterName);
-            webService.WebService();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void startApplication(Stage primaryStage) throws IOException {
+        LoginController loginController = new LoginController();
+        primaryStage.setTitle("BoostRoyal");
+        FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));
+        loginXML.setController(loginController);
+        Parent root = loginXML.load();
+        Scene scene = new Scene(root);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
-    public static void setToken(String token){
-        Loginer.token = token;
+    @Override
+    public void stop() throws Exception {
+        timer.cancel();
+        Platform.exit();
+        System.exit(0);
+        super.stop();
     }
+
 }
