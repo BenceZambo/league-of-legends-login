@@ -17,42 +17,6 @@ public class HttpHandler {
 
     private final String USER_AGENT = "Mozilla/5.0";
 
-    // HTTP GET request
-    public String sendingGetRequest() throws Exception {
-
-        String urlString = "http://localhost:9999/";
-
-        URL url = new URL(urlString);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        // By default it is GET request
-        con.setRequestMethod("GET");
-
-        //add request header
-        con.setRequestProperty("User-Agent", USER_AGENT);
-
-        int responseCode = con.getResponseCode();
-        System.out.println("Sending get request : "+ url);
-        System.out.println("Response code : "+ responseCode);
-
-        // Reading response from input Stream
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String output;
-        StringBuffer response = new StringBuffer();
-
-        while ((output = in.readLine()) != null) {
-            response.append(output);
-        }
-        in.close();
-
-        //printing result from response
-        System.out.println(response.toString());
-
-        return response.toString();
-
-    }
-
     // HTTP Post request
     public String sendingPostRequest(String url, LinkedHashMap<String,String> parameters) throws Exception {
 
@@ -82,8 +46,6 @@ public class HttpHandler {
         wr.close();
 
         int responseCode = con.getResponseCode();
-        System.out.println("nSending 'POST' request to URL : " + url);
-        System.out.println("Response Code : " + responseCode);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));

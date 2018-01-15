@@ -60,7 +60,7 @@ public class LoginController implements Initializable{
             String token;
             String JSONToken;
             try {
-                JSONToken = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/auth/login", urlParameters);
+                JSONToken = httpHandler.sendingPostRequest("http://api.boostroyal.com/auth/login", urlParameters);
                 JsonObject jsonObject = (new JsonParser()).parse(JSONToken).getAsJsonObject();
                 token = jsonObject.get("token").toString();
             } catch (Exception e1) {
@@ -83,7 +83,7 @@ public class LoginController implements Initializable{
 
                 WebSocketClient webSocketClient = null;
                 try {
-                    webSocketClient = new WebSocketClient(new URI("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com"));
+                    webSocketClient = new WebSocketClient(new URI("http://api.boostroyal.com"));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }

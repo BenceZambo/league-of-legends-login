@@ -85,20 +85,12 @@ public class BoosterPageController implements Initializable {
         String username = orderSelected.getLoginname();
         String password = orderSelected.getLoginpassword();
 
-        System.out.println(username);
-        System.out.println(password);
-
-        /*orderNotification, { type: 'login VAGY logout', id: 'order id itt', to: 'customer_id (ezt is elküldöm orderekkel együtt)' }
-        ja és a küldésnél a customer_id-t azt arrayba küld
-        Áron Liptai*/
-
 
         if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING){
             AutoLoginer autoLoginer = new AutoLoginer();
             try {
                 //TODO websocket send order login to server
 
-                System.out.println(closeMethodSet);
                 if (closeMethodSet == false){
                     setClose();
                     lolGameLogger.turnOn();
@@ -176,7 +168,7 @@ public class BoosterPageController implements Initializable {
         ObservableList<Order> products = FXCollections.observableArrayList();
         String response = "";
         try {
-            response = httpHandler.sendingPostRequest("http://boostroyal.fhesfjrizw.eu-west-2.elasticbeanstalk.com/order/getOrdersApp", urlParameters);
+            response = httpHandler.sendingPostRequest("http://api.boostroyal.com/order/getOrdersApp", urlParameters);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -50,23 +50,6 @@ public class Loginer extends javafx.application.Application {
     @Override
     public void start(Stage primaryStage) throws IOException, NativeHookException {
         utils.readKeys();
-        //TaskKiller.requestRunningProccesses();
-        Platform.setImplicitExit(false);
-
-        /*primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                isLolClientRunning = accessWindow.checkIfRunning(Globals.lolClient);
-                isLolGameRunning = accessWindow.checkIfRunning(Globals.lolGame);
-
-                if(isLolGameRunning || isLolClientRunning) {
-                    event.consume();
-                    AlertBox.display("You can't close me", "Sorry dude, you can not close me if lol is running.");
-                } else {
-                    Platform.exit();
-                }
-            }
-        });*/
 
         startApplication(primaryStage);
     }
@@ -84,7 +67,6 @@ public class Loginer extends javafx.application.Application {
 
     @Override
     public void stop() throws Exception {
-        System.out.println("Ez a loginerből volt");
         timer.cancel();
         Platform.exit();
         System.exit(0);
