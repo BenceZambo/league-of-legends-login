@@ -32,12 +32,10 @@ public class WebSocketClient {
                     @Override
                     public void call(Object... args) {
                         JSONObject obj = (JSONObject) args[0];
-                        System.out.println(obj.toString());
                         try {
                             String type = obj.getString("type");
                             int id = obj.getInt("id");
                             Order order = boosterPageController.getCurrentOrder();
-                            System.out.println(order.getId());
                             if (order.getId().equals(15832) && type.equals("pause")) {
                                 System.out.println("WARNING");
                                 boosterPageController.initData();
@@ -76,7 +74,7 @@ public class WebSocketClient {
     }
 
     public void send(String key, Object object){
-        socket.emit(key, object);
+        socket.send(key, object);
     }
 
     public void disconnect(){

