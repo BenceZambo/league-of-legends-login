@@ -64,11 +64,15 @@ public class LoginController implements Initializable{
                 JsonObject jsonObject = (new JsonParser()).parse(JSONToken).getAsJsonObject();
                 token = jsonObject.get("token").toString();
             } catch (Exception e1) {
+                System.out.println(e1.toString());
+                if (e1.toString().equals("java.io.IOException: Server returned HTTP response code: 426 for URL: http://api.boostroyal.com/auth/login")){
+                    JSONToken = "426";
+                }else{
+                    JSONToken = null;
+                }
                 token = null;
-                JSONToken = null;
             }
 
-            //sRyMAN4/3
             if (token != null) {
 
                 Gson gson = new Gson();
@@ -100,7 +104,11 @@ public class LoginController implements Initializable{
                 Stage stage = (Stage) node.getScene().getWindow();
                 stage.setScene(scene);
                 stage.show();
-            } else {
+            }
+            if (JSONToken == "426"){
+                AlertBox.display("Alert", "Please download the updates");
+            }
+            if (JSONToken == null){
                 AlertBox.display("Alert", "Invalid email, or password!");
             }
         }else{

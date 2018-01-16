@@ -13,13 +13,6 @@ public class TaskKiller {
 
     private static Runtime runtime = Runtime.getRuntime();
 
-    public static void checkRunningGame(String processName) {
-        if(processName.equals(LEAUGE_OF_LEGENDS)) {
-            System.out.println("Please finish your game and then restart the application");
-            System.exit(1);
-        }
-    }
-
     public static void closeRunningClient(String processName) throws IOException {
         if (processName.equals(LOL_CLIENT))
             runtime.exec(taskkill + LOL_CLIENT);
@@ -31,7 +24,6 @@ public class TaskKiller {
 
         while((processName = input.readLine()) != null) {
             processName = processName.replaceAll("\\s", "");
-            checkRunningGame(processName);
             arrayList.add(processName);
         }
 
@@ -44,7 +36,6 @@ public class TaskKiller {
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             ArrayList<String> arrayList = readProccesses(input);
-            System.out.println(arrayList);
             process.destroy();
 
             /*for(String processName: arrayList){
