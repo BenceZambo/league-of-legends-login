@@ -73,7 +73,6 @@ public class LoginController implements Initializable{
                 token = null;
             }
 
-            //sRyMAN4/3
             if (token != null) {
 
                 Gson gson = new Gson();
