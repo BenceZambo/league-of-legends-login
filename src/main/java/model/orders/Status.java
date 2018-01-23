@@ -1,4 +1,4 @@
-package model;
+package model.orders;
 
 import com.google.gson.annotations.SerializedName;
 

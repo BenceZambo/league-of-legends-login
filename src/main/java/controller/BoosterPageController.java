@@ -22,15 +22,14 @@ import logger.Globals;
 import logger.KeyLogger;
 import logger.LolClientLogger;
 import logger.LolGameLogger;
-import model.Order;
-import model.Status;
+import model.orders.Order;
+import model.orders.Status;
 import model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.OrderService;
 import services.Utils;
 import view.AlertBox;
-import view.Loginer;
 import webService.HttpHandler;
 import webService.WebSocketClient;
 
@@ -50,6 +49,8 @@ public class BoosterPageController implements Initializable {
     Button reFresh;
     @FXML
     Button signOut;
+    @FXML
+    Button setUpButton;
     @FXML
     Button launchButton;
     @FXML
@@ -76,62 +77,75 @@ public class BoosterPageController implements Initializable {
         this.webSocketClient = webSocketClient;
     }
 
-    @FXML
-    public void launchButtonHandler() {
-        Order orderSelected;
+    public void launchButtonHandler(){
+        AutoLoginer autoLoginer = new AutoLoginer();
 
+        if (autoLoginer.checkIfConfigFileValid(currentOrder)){
+
+            if (closeMethodSet == false){
+                setClose();
+                lolGameLogger.turnOn();
+                lolClientLogger.turnOn();
+                closeMethodSet = true;
+            }
+
+            if (loggedIn){
+                JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
+                webSocketClient.send("orderNotification", logoutJsonObject);
+                System.out.println("logout websocket message sent" + logoutJsonObject.toString());
+                if(KeyLogger.log.size() != 0) {
+                    utils.uploadLog(user, currentOrder);
+                }
+            }
+
+            try {
+                autoLoginer.logMeIn(currentOrder.getLoginpassword());
+            } catch (AWTException e) {
+                e.printStackTrace();
+            }
+
+            JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, currentOrder);
+            webSocketClient.send("orderNotification", loginJsonObject);
+            System.out.println("login websocket sent" + loginJsonObject.toString());
+
+            loggedIn = true;
+
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    ArrayList<String> runningProcesses = TaskKiller.requestRunningProccesses();
+                    for (String process : runningProcesses) {
+                        if(process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
+                            utils.scriptAlert = true;
+                        }
+                    }
+                }
+            }, 1000, 300000);
+
+        }else{
+            AlertBox.display("Set up failed", "Please press SetUp button before Launch");
+        }
+    }
+
+    @FXML
+    public void setUpButtonHandler() {
+        Order orderSelected;
         orderSelected = table.getSelectionModel().getSelectedItem();
 
-        String username = orderSelected.getLoginname();
-        String password = orderSelected.getLoginpassword();
-
-
-        if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING){
+        if (!accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING){
             AutoLoginer autoLoginer = new AutoLoginer();
             try {
                 //TODO websocket send order login to server
 
-                if (closeMethodSet == false){
-                    setClose();
-                    lolGameLogger.turnOn();
-                    lolClientLogger.turnOn();
-                    closeMethodSet = true;
-                }
-
-                autoLoginer.logMeIn(username, password);
-                if (loggedIn){
-                    JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
-                    webSocketClient.send("orderNotification", logoutJsonObject);
-                    System.out.println("logout websocket message sent" + logoutJsonObject.toString());
-                    if(KeyLogger.log.size() != 0) {
-                        utils.uploadLog(user, currentOrder);
-                    }
-                }
-                JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, orderSelected);
-                webSocketClient.send("orderNotification", loginJsonObject);
-                System.out.println("login websocket sent" + loginJsonObject.toString());
+                autoLoginer.setUp(orderSelected);
                 currentOrder = orderSelected;
-                loggedIn = true;
 
-
-                timer.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                        ArrayList<String> runningProcesses = TaskKiller.requestRunningProccesses();
-                        for (String process : runningProcesses) {
-                            if(process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
-                                utils.scriptAlert = true;
-                            }
-                        }
-                    }
-                }, 1000, 300000);
-
-            } catch (AWTException e) {
+            } catch (Exception e) {
                 AlertBox.display("Login fail", "Can't login");
             }
         }
-        if (!accessWindow.checkIfRunning(Globals.lolClient)){
-            AlertBox.display("Client does not run", "Please run the League of Legends client");
+        if (accessWindow.checkIfRunning(Globals.lolClient)){
+            AlertBox.display("Client runs", "Please close the League of Legends client");
         }
         if (orderSelected.getStatus() == Status.PAUSED){
             AlertBox.display("Order paused", "This order is paused, you cannot boost on this");
@@ -188,6 +202,7 @@ public class BoosterPageController implements Initializable {
         server_column.setCellValueFactory(new PropertyValueFactory<>("server"));
         status_column.setCellValueFactory(new PropertyValueFactory<>("status"));
 
+        setUpButton.setOnAction(event -> setUpButtonHandler());
         launchButton.setOnAction(event -> launchButtonHandler());
 
         signOut.setOnAction(event -> {

@@ -4,7 +4,7 @@ import controller.BoosterPageController;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-import model.Order;
+import model.orders.Order;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.WindowWatcher;

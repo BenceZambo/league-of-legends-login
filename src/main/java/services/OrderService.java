@@ -1,6 +1,6 @@
 package services;
 
-import model.Order;
+import model.orders.Order;
 
 public class OrderService {
 
