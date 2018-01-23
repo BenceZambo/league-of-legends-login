@@ -29,6 +29,7 @@ import logger.LolGameLogger;
 import model.orders.Order;
 import model.orders.Status;
 import model.User;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.OrderService;
@@ -99,15 +100,6 @@ public class BoosterPageController implements Initializable {
                 closeMethodSet = true;
             }
 
-            if (loggedIn){
-                JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
-                webSocketClient.send("orderNotification", logoutJsonObject);
-                System.out.println("logout websocket message sent" + logoutJsonObject.toString());
-                if(KeyLogger.log.size() != 0) {
-                    utils.uploadLog(user, currentOrder);
-                }
-            }
-
             try {
                 autoLoginer.logMeIn(currentOrder.getLoginpassword());
             } catch (AWTException e) {
@@ -147,6 +139,16 @@ public class BoosterPageController implements Initializable {
             try {
                 //TODO websocket send order login to server
                 autoLoginer.setUp(orderSelected);
+
+                if (loggedIn){
+                    JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
+                    webSocketClient.send("orderNotification", logoutJsonObject);
+                    System.out.println("logout websocket message sent" + logoutJsonObject.toString());
+                    if(KeyLogger.log.size() != 0) {
+                        utils.uploadLog(user, currentOrder);
+                    }
+                }
+
                 currentOrder = orderSelected;
 
             } catch (Exception e) {
@@ -167,16 +169,19 @@ public class BoosterPageController implements Initializable {
     @FXML
     public void signoutButtonHandler(ActionEvent event) throws IOException {
         if (!accessWindow.checkIfRunning(Globals.lolClient)){
-        webSocketClient.disconnect();
-        LoginController loginController = new LoginController();
-        FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));
-        loginXML.setController(loginController);
-        Parent root = loginXML.load();
-        Scene scene = new Scene(root);
-        Node node=(Node) event.getSource();
-        Stage stage=(Stage) node.getScene().getWindow();
-        stage.setScene(scene);
-        stage.show();}
+            JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
+            webSocketClient.send("orderNotification", logoutJsonObject);
+            webSocketClient.disconnect();
+            LoginController loginController = new LoginController();
+            FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));
+            loginXML.setController(loginController);
+            Parent root = loginXML.load();
+            Scene scene = new Scene(root);
+            Node node=(Node) event.getSource();
+            Stage stage=(Stage) node.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        }
         else {
             AlertBox.display("Error", "Close the lol client.");
         }
@@ -238,8 +243,8 @@ public class BoosterPageController implements Initializable {
 
     public JSONObject getLogInJSON(JSONType jsonType, Order order){
         JSONObject loginJsonObject = new JSONObject();
-        Integer[] to = new Integer[1];
-        to[0] = order.getCustomer_id();
+        JSONArray to = new JSONArray();
+        to.put(order.getCustomer_id());
         try {
             loginJsonObject.put("to", to);
             loginJsonObject.put("id", order.getId());

@@ -74,7 +74,7 @@ public class WebSocketClient {
     }
 
     public void send(String key, Object object){
-        socket.send(key, object);
+        socket.emit(key, object);
     }
 
     public void disconnect(){
