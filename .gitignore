@@ -108,3 +108,4 @@ buildNumber.properties
 src/main/resources/keys.csv
 src\main\resources\keys.csv
 loginData.txt
+LoLClientFilePath.txt

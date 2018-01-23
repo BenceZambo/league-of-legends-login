@@ -27,7 +27,6 @@ import view.AlertBox;
 import webService.HttpHandler;
 import webService.WebSocketClient;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

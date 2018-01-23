@@ -22,7 +22,7 @@ public class AutoLoginer {
     }
 
     public void setUp(Order order){
-        ConfigFileWriter configFileWriter = new ConfigFileWriter("D:\\Riot Games\\League of Legends\\Config\\LeagueClientSettings.yaml");
+        ConfigFileWriter configFileWriter = new ConfigFileWriter(Globals.LoLSettingsFilePath);
         String server = order.getServer().toString();
         String username = order.getLoginname();
 
@@ -71,13 +71,17 @@ public class AutoLoginer {
     }
 
     public boolean checkIfConfigFileValid(Order order){
-        ConfigFileReader configFileReader = new ConfigFileReader("D:\\Riot Games\\League of Legends\\Config\\LeagueClientSettings.yaml");
+        ConfigFileReader configFileReader = new ConfigFileReader(Globals.LoLSettingsFilePath);
         String fileContent = configFileReader.read();
 
         if (order == null){
             return false;
         }
         if (fileContent.indexOf(order.getLoginname()) != -1 && fileContent.indexOf(order.getServer().toString()) != -1){
+            System.out.println("loginname: " + order.getLoginname());
+            System.out.println("Server: " + order.getServer().toString());
+            System.out.println(fileContent.indexOf(order.getLoginname()) != -1);
+            System.out.println(fileContent.indexOf(order.getServer().toString()) != -1);
             return true;
         }else{
             return false;
@@ -87,7 +91,7 @@ public class AutoLoginer {
     private void clientExecutor(){
         Runtime runTime = Runtime.getRuntime();
         try {
-            runTime.exec("D:\\Riot Games\\League of Legends\\LeagueClient");
+            runTime.exec(Globals.LoLClientFilePath);
         } catch (IOException e) {
             e.printStackTrace();
         }

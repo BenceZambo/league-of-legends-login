@@ -2,6 +2,8 @@ package controller;
 
 import com.google.gson.Gson;
 import environment.AccessWindow;
+import environment.ConfigFileReader;
+import environment.ConfigFileWriter;
 import environment.TaskKiller;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -14,9 +16,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import logger.Globals;
 import logger.KeyLogger;
@@ -34,6 +38,8 @@ import webService.HttpHandler;
 import webService.WebSocketClient;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -45,6 +51,8 @@ public class BoosterPageController implements Initializable {
     boolean loggedIn = false;
     boolean closeMethodSet = false;
     Order currentOrder;
+    @FXML
+    MenuItem menuItem;
     @FXML
     Button reFresh;
     @FXML
@@ -79,8 +87,10 @@ public class BoosterPageController implements Initializable {
 
     public void launchButtonHandler(){
         AutoLoginer autoLoginer = new AutoLoginer();
+        Order orderSelected;
+        orderSelected = table.getSelectionModel().getSelectedItem();
 
-        if (autoLoginer.checkIfConfigFileValid(currentOrder)){
+        if (autoLoginer.checkIfConfigFileValid(orderSelected)){
 
             if (closeMethodSet == false){
                 setClose();
@@ -123,7 +133,7 @@ public class BoosterPageController implements Initializable {
             }, 1000, 300000);
 
         }else{
-            AlertBox.display("Set up failed", "Please press SetUp button before Launch");
+            AlertBox.display("Set up failed", "Please press SetUp button before Launch. If you pressed it, then you did it with another order!");
         }
     }
 
@@ -132,11 +142,10 @@ public class BoosterPageController implements Initializable {
         Order orderSelected;
         orderSelected = table.getSelectionModel().getSelectedItem();
 
-        if (!accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING){
+        if (!accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING && Globals.LoLClientFilePath != ""){
             AutoLoginer autoLoginer = new AutoLoginer();
             try {
                 //TODO websocket send order login to server
-
                 autoLoginer.setUp(orderSelected);
                 currentOrder = orderSelected;
 
@@ -149,6 +158,9 @@ public class BoosterPageController implements Initializable {
         }
         if (orderSelected.getStatus() == Status.PAUSED){
             AlertBox.display("Order paused", "This order is paused, you cannot boost on this");
+        }
+        if (Globals.LoLClientFilePath == ""){
+            AlertBox.display("LoL Client location not found", "Please, set your LoL Client.exe file under the Settings menu!");
         }
     }
 
@@ -197,6 +209,12 @@ public class BoosterPageController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        ConfigFileReader configFileReader = new ConfigFileReader("LoLClientFilePath.txt");
+        String LoLPath = configFileReader.read();
+        if (LoLPath != null){
+            Globals.LoLClientFilePath = LoLPath;
+            Globals.LoLSettingsFilePath = LoLPath.replace("LeagueClient.exe", "Config\\LeagueClientSettings.yaml");
+        }
         id_column.setCellValueFactory(new PropertyValueFactory<>("id"));
         purchase_column.setCellValueFactory(new PropertyValueFactory<>("purchase"));
         server_column.setCellValueFactory(new PropertyValueFactory<>("server"));
@@ -214,7 +232,7 @@ public class BoosterPageController implements Initializable {
         });
 
         reFresh.setOnAction(event -> initData());
-
+        menuItem.setOnAction(event -> setLoLPath());
         initData();
     }
 
@@ -236,10 +254,11 @@ public class BoosterPageController implements Initializable {
         return loginJsonObject;
     }
 
-    private enum JSONType{
-        LOGIN, LOGOUT
-    }
 
+
+    private enum JSONType{
+        LOGIN, LOGOUT;
+    }
     private void setClose(){
         Stage stage = (Stage) signOut.getScene().getWindow();
         stage.setOnCloseRequest(event -> {
@@ -267,5 +286,16 @@ public class BoosterPageController implements Initializable {
 
     public Order getCurrentOrder(){
         return currentOrder;
+    }
+
+    private void setLoLPath() {
+        ConfigFileWriter configFileWriter = new ConfigFileWriter("LoLClientFilePath.txt");
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Open File");
+        File file = chooser.showOpenDialog(new Stage());
+        configFileWriter.write(file.getAbsolutePath());
+        Globals.LoLClientFilePath = file.getAbsolutePath();
+
+        Globals.LoLSettingsFilePath = file.getAbsolutePath().replace("LeagueClient.exe", "Config\\LeagueClientSettings.yaml");
     }
 }
