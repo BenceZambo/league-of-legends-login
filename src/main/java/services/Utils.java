@@ -1,7 +1,7 @@
 package services;
 
 import logger.KeyLogger;
-import model.Order;
+import model.orders.Order;
 import model.User;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package model;
+package model.orders;
 
 public class Order {
     String purchase;

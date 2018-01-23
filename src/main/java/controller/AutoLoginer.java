@@ -2,7 +2,11 @@ package controller;
 
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
+import environment.AccessWindow;
+import environment.ConfigFileReader;
+import environment.ConfigFileWriter;
 import logger.Globals;
+import model.orders.Order;
 import view.AlertBox;
 
 import java.awt.*;
@@ -10,87 +14,86 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 public class AutoLoginer {
 
     public AutoLoginer() {
     }
 
-    public void logMeIn(String username, String password) throws AWTException {
+    public void setUp(Order order){
+        ConfigFileWriter configFileWriter = new ConfigFileWriter(Globals.LoLSettingsFilePath);
+        String server = order.getServer().toString();
+        String username = order.getLoginname();
+
+        String newFileContent =  "install:\n" +
+                "    globals:\n" +
+                "        locale: \"en_US\"\n" +
+                "        region: \"" + server + "\"\n" +
+                "    login-remember-me:\n" +
+                "        rememberMe: false\n" +
+                "        username: \"" + username + "\"";
+
+        configFileWriter.write("");
+        configFileWriter.write(newFileContent);
+        clientExecutor();
+    }
+
+    public void logMeIn(String password) throws AWTException {
         Robot robot = new Robot();
-        robot.setAutoDelay(3);
+        robot.setAutoDelay(25);
         robot.setAutoWaitForIdle(true);
         Clipboard clipBoard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-        StringSelection accountName = new StringSelection(username);
+        clientExecutor();
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         StringSelection accountPassword= new StringSelection(password);
         StringSelection clear = new StringSelection("");
-        clipBoard.setContents(accountName, accountName);
+        clipBoard.setContents(accountPassword, accountPassword);
 
-        WinDef.HWND hwnd = User32.INSTANCE.FindWindow(null, Globals.lolClient);
-        WinDef.HWND hwnd1 = User32.INSTANCE.FindWindow("Shell_TrayWnd", null);
-        System.out.println(hwnd1.toString());
-        System.out.println("HWND ez az: " + hwnd.toString());
-        System.out.println(User32.INSTANCE.SetForegroundWindow(hwnd));
-        WinDef.RECT rect = new WinDef.RECT();
-        User32.INSTANCE.GetWindowRect(hwnd, rect);
-        System.out.println(rect.toRectangle().getHeight());
-        System.out.println(rect.toRectangle().getWidth());
-        if (rect.toRectangle().getHeight() > 29 || rect.toRectangle().getWidth() > 161) {
-            int windowLeftCoordinate = rect.left;
-            int windowTopCoordinate = rect.top;
-            int windowHeight = rect.toRectangle().height;
-            int x, y;
-            switch (windowHeight) {
-                case 576:
-                    x = windowLeftCoordinate + 1024 - 100;
-                    y = windowTopCoordinate + 140;
-                    break;
-                case 720:
-                    x = windowLeftCoordinate + 1280 - 115;
-                    y = windowTopCoordinate + 180;
-                    break;
-                case 900:
-                    x = windowLeftCoordinate + 1600 - 160;
-                    y = windowTopCoordinate + 230;
-                    break;
-                default:
-                    x = 0;
-                    y = 0;
-            }
+        robot.keyPress(KeyEvent.VK_CONTROL);
+        robot.keyPress(KeyEvent.VK_V);
 
-            robot.mouseMove(x, y);
-            robot.mousePress(InputEvent.BUTTON1_MASK);
-            robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        robot.keyRelease(KeyEvent.VK_CONTROL);
+        robot.keyRelease(KeyEvent.VK_V);
 
-            robot.delay(5);
-            robot.mousePress(InputEvent.BUTTON1_MASK);
-            robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        clipBoard.setContents(clear, clear);
 
-            robot.delay(5);
-            robot.mousePress(InputEvent.BUTTON1_MASK);
-            robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        robot.delay(10);
 
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            robot.keyPress(KeyEvent.VK_V);
+        robot.keyPress(KeyEvent.VK_ENTER);
+        robot.keyRelease(KeyEvent.VK_ENTER);
+    }
 
-            robot.keyRelease(KeyEvent.VK_CONTROL);
-            robot.keyRelease(KeyEvent.VK_V);
+    public boolean checkIfConfigFileValid(Order order){
+        ConfigFileReader configFileReader = new ConfigFileReader(Globals.LoLSettingsFilePath);
+        String fileContent = configFileReader.read();
 
-            robot.keyPress(KeyEvent.VK_TAB);
-            robot.keyRelease(KeyEvent.VK_TAB);
-
-            clipBoard.setContents(accountPassword, accountPassword);
-
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            robot.keyPress(KeyEvent.VK_V);
-
-            robot.keyRelease(KeyEvent.VK_CONTROL);
-            robot.keyRelease(KeyEvent.VK_V);
-
-            clipBoard.setContents(clear, clear);
+        if (order == null){
+            return false;
+        }
+        if (fileContent.indexOf(order.getLoginname()) != -1 && fileContent.indexOf(order.getServer().toString()) != -1){
+            System.out.println("loginname: " + order.getLoginname());
+            System.out.println("Server: " + order.getServer().toString());
+            System.out.println(fileContent.indexOf(order.getLoginname()) != -1);
+            System.out.println(fileContent.indexOf(order.getServer().toString()) != -1);
+            return true;
         }else{
-            AlertBox.display("LoL clien is on tray", "Please click on LoL client, and than you could auto login int the program!");
+            return false;
+        }
+    }
+
+    private void clientExecutor(){
+        Runtime runTime = Runtime.getRuntime();
+        try {
+            runTime.exec(Globals.LoLClientFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

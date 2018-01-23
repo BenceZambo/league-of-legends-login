@@ -6,6 +6,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import environment.ConfigFileReader;
+import environment.ConfigFileWriter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,21 +15,25 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import logger.Globals;
 import model.User;
+import org.json.JSONException;
+import org.json.JSONObject;
 import services.OrderService;
 import view.AlertBox;
 import webService.HttpHandler;
 import webService.WebSocketClient;
 
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,13 +50,30 @@ public class LoginController implements Initializable{
     @FXML
     Button login;
 
+    @FXML
+    CheckBox rememberMe;
+
     public void handleLoginButton(javafx.event.ActionEvent event) throws IOException {
         if (validate(username.getText())) {
-            HttpHandler httpHandler = new HttpHandler();
-            LinkedHashMap<String, String> urlParameters = new LinkedHashMap();
 
             String username = this.username.getText();
             String password = this.password.getText();
+
+            ConfigFileWriter configFileWriter = new ConfigFileWriter("loginData.txt");
+            if (rememberMe.isSelected()){
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("username", username);
+                    jsonObject.put("password", password);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                configFileWriter.write(jsonObject.toString());
+            }else{
+                configFileWriter.write("");
+            }
+            HttpHandler httpHandler = new HttpHandler();
+            LinkedHashMap<String, String> urlParameters = new LinkedHashMap();
 
             urlParameters.put("email", username);
             urlParameters.put("password", password);
@@ -118,6 +141,12 @@ public class LoginController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        Map<String, String> loginData = getLoginData();
+        if (loginData != null){
+            username.setText(loginData.get("username"));
+            password.setText(loginData.get("password"));
+            rememberMe.setSelected(true);
+        }
         login.setOnAction(event -> {
             try {
                 handleLoginButton(event);
@@ -146,5 +175,23 @@ public class LoginController implements Initializable{
         matcher = pattern.matcher(hex);
         return matcher.matches();
 
+    }
+
+    private Map<String, String> getLoginData(){
+        ConfigFileReader configFileReader = new ConfigFileReader("loginData.txt");
+        String loginData = configFileReader.read();
+        if (loginData == null){
+            return null;
+        }
+        JSONObject dataInJSON = null;
+        HashMap<String, String> result = new HashMap<>();
+        try {
+            dataInJSON = new JSONObject(loginData);
+            result.put("username", dataInJSON.getString("username"));
+            result.put("password", dataInJSON.getString("password"));
+        } catch (JSONException e) {
+            return null;
+        }
+        return result;
     }
 }
