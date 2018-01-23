@@ -6,6 +6,7 @@ import environment.AccessWindow;
 import environment.ConfigFileReader;
 import environment.ConfigFileWriter;
 import logger.Globals;
+import model.User;
 import model.orders.Order;
 import view.AlertBox;
 
@@ -46,8 +47,9 @@ public class AutoLoginer {
         Clipboard clipBoard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
         clientExecutor();
+
         try {
-            Thread.sleep(300);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -56,15 +58,18 @@ public class AutoLoginer {
         StringSelection clear = new StringSelection("");
         clipBoard.setContents(accountPassword, accountPassword);
 
+        robot.delay(50);
         robot.keyPress(KeyEvent.VK_CONTROL);
         robot.keyPress(KeyEvent.VK_V);
+
+        robot.delay(150);
 
         robot.keyRelease(KeyEvent.VK_CONTROL);
         robot.keyRelease(KeyEvent.VK_V);
 
         clipBoard.setContents(clear, clear);
 
-        robot.delay(10);
+        robot.delay(25);
 
         robot.keyPress(KeyEvent.VK_ENTER);
         robot.keyRelease(KeyEvent.VK_ENTER);

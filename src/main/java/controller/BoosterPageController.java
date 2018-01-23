@@ -51,6 +51,7 @@ public class BoosterPageController implements Initializable {
     OrderService orderService;
     boolean loggedIn = false;
     boolean closeMethodSet = false;
+    boolean didSetUp = false;
     Order currentOrder;
     @FXML
     MenuItem menuItem;
@@ -106,9 +107,12 @@ public class BoosterPageController implements Initializable {
                 e.printStackTrace();
             }
 
-            JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, currentOrder);
-            webSocketClient.send("orderNotification", loginJsonObject);
-            System.out.println("login websocket sent" + loginJsonObject.toString());
+            if (didSetUp) {
+                JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, currentOrder);
+                webSocketClient.send("orderNotification", loginJsonObject);
+                System.out.println("login websocket sent" + loginJsonObject.toString());
+                didSetUp = false;
+            }
 
             loggedIn = true;
 
@@ -150,19 +154,20 @@ public class BoosterPageController implements Initializable {
                 }
 
                 currentOrder = orderSelected;
+                didSetUp = true;
 
             } catch (Exception e) {
                 AlertBox.display("Login fail", "Can't login");
             }
         }
-        if (accessWindow.checkIfRunning(Globals.lolClient)){
-            AlertBox.display("Client runs", "Please close the League of Legends client");
-        }
-        if (orderSelected.getStatus() == Status.PAUSED){
+        else if (orderSelected.getStatus() == Status.PAUSED){
             AlertBox.display("Order paused", "This order is paused, you cannot boost on this");
         }
-        if (Globals.LoLClientFilePath == ""){
+        else if (Globals.LoLClientFilePath == ""){
             AlertBox.display("LoL Client location not found", "Please, set your LoL Client.exe file under the Settings menu!");
+        }
+        else if (accessWindow.checkIfRunning(Globals.lolClient)){
+            AlertBox.display("Client runs", "Please close the League of Legends client");
         }
     }
 
