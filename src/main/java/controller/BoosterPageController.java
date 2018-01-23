@@ -26,9 +26,9 @@ import logger.Globals;
 import logger.KeyLogger;
 import logger.LolClientLogger;
 import logger.LolGameLogger;
+import model.User;
 import model.orders.Order;
 import model.orders.Status;
-import model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +40,6 @@ import webService.WebSocketClient;
 
 import java.awt.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -157,6 +156,7 @@ public class BoosterPageController implements Initializable {
                 didSetUp = true;
 
             } catch (Exception e) {
+                e.printStackTrace();
                 AlertBox.display("Login fail", "Can't login");
             }
         }
