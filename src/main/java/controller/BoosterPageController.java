@@ -90,6 +90,7 @@ public class BoosterPageController implements Initializable {
         AutoLoginer autoLoginer = new AutoLoginer();
         Order orderSelected;
         orderSelected = table.getSelectionModel().getSelectedItem();
+        utils.disableChat(orderSelected.getServer().toString());
 
         if (autoLoginer.checkIfConfigFileValid(orderSelected)){
 
@@ -174,6 +175,7 @@ public class BoosterPageController implements Initializable {
     @FXML
     public void signoutButtonHandler(ActionEvent event) throws IOException {
         if (!accessWindow.checkIfRunning(Globals.lolClient)){
+            utils.enableChat();
             JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
             webSocketClient.send("orderNotification", logoutJsonObject);
             webSocketClient.disconnect();
@@ -277,6 +279,7 @@ public class BoosterPageController implements Initializable {
             event.consume();
         } else {
                 if (loggedIn){
+                    utils.enableChat();
                     JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
                     webSocketClient.send("orderNotification", logoutJsonObject);
                     System.out.println("websocket message sent" + "habhahahaha");

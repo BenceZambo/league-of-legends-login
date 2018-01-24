@@ -168,6 +168,17 @@ public class Utils {
             case "EUW": return "185.40.64.69";
             case "EUNE": return "185.40.64.111";
             case "NA": return "192.64.174.69";
+            case "TR": return "";
+            case "RU": return "";
+            case "BR": return "";
+            case "LAN": return "";
+            case "LAS": return "";
+            case "OCE": return "";
+            case "JP": return "";
+            case "SEA": return "";
+            case "KR": return "";
+            case "CN": return "";
+            case "PBE": return "";
         }
         return null;
     }

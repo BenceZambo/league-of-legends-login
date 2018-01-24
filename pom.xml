@@ -92,6 +92,7 @@
                             <headerType>gui</headerType>
                             <jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
                             <outfile>${project.build.directory}/boostroyal.exe</outfile>
+                            <manifest>src/main/resources/boostroyalManifest.exe.manifest</manifest>
                             <classPath>
                                 <mainClass>Main</mainClass>
                                 <preCp>anything</preCp>
