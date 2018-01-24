@@ -5,12 +5,10 @@ import model.orders.Order;
 import model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
+import view.AlertBox;
 import webService.AWSWebService;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -19,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.Timer;
+import java.util.logging.Logger;
 
 public class Utils {
 
@@ -144,6 +143,51 @@ public class Utils {
         AWSWebService.bucketName = keys.get(2);
         AWSWebService.folder = keys.get(3);
         AWSWebService.region = keys.get(4);
+    }
+
+    public void disableChat(String server) {
+        String[] command = {"cmd", "/c", "netsh advfirewall firewall add rule name=\"lolchat\" dir=out remoteip=" + getServerIp(server) + " protocol=TCP action=block"};
+        StringBuilder cmdReturn = new StringBuilder();
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            try (InputStream inputStream = process.getInputStream()) {
+                int c;
+                while ((c = inputStream.read()) != -1) {
+                    cmdReturn.append((char) c);
+                }
+            }
+            System.out.println(cmdReturn.toString());
+
+        } catch (IOException ex) {
+            System.out.println("ASD");
+        }
+    }
+
+    private String getServerIp(String server) {
+        switch (server) {
+            case "EUW": return "185.40.64.69";
+            case "EUNE": return "185.40.64.111";
+            case "NA": return "192.64.174.69";
+        }
+        return null;
+    }
+
+    public void enableChat() {
+        String[] command = {"cmd", "/c", "netsh advfirewall firewall delete rule name=\"lolchat\""};
+        StringBuilder cmdReturn = new StringBuilder();
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            try (InputStream inputStream = process.getInputStream()) {
+                int c;
+                while ((c = inputStream.read()) != -1) {
+                    cmdReturn.append((char) c);
+                }
+            }
+            System.out.println(cmdReturn.toString());
+
+        } catch (IOException ex) {
+            System.out.println("ASD");
+        }
     }
 
 }

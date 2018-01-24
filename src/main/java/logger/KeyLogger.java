@@ -41,6 +41,7 @@ public abstract class KeyLogger {
 
     void saveMessage() throws IOException {
         log.add(message + "\n");
+        System.out.println(message);
         setDefaults();
     }
 
