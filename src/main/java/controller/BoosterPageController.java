@@ -91,7 +91,6 @@ public class BoosterPageController implements Initializable {
         Order orderSelected;
         orderSelected = table.getSelectionModel().getSelectedItem();
         utils.disableChat(orderSelected.getServer().toString());
-
         if (autoLoginer.checkIfConfigFileValid(orderSelected)){
 
             if (closeMethodSet == false){

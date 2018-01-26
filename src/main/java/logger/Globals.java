@@ -6,4 +6,5 @@ public class Globals {
     public static final String Version = "1.1";
     public static String LoLClientFilePath = "";
     public static String LoLSettingsFilePath = "";
+    public static String logUploadURL = "";
 }
