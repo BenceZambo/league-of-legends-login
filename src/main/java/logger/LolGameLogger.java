@@ -17,7 +17,7 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
     private boolean isLogging;
 
     private LolGameLogger() {
-        super.message = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
+        baseMessage = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
         super.sendKey = "Enter";
     }
 
@@ -27,7 +27,8 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
 
     @Override
     void setDefaults() {
-        super.message = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
+        baseMessage = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
+        message = "";
     }
 
     @Override

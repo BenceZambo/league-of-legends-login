@@ -11,8 +11,15 @@ public class Order {
 
     Status status;
     Server server;
+    Boolean appearOffline;
+
     public Order() {
     }
+
+    public boolean isAppearOffline() { return appearOffline; }
+
+    public void setAppearOffline(boolean appearOffline) { this.appearOffline = appearOffline; }
+
     public String getPurchase() {
         return purchase;
     }

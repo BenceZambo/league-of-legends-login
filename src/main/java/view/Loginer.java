@@ -49,8 +49,6 @@ public class Loginer extends javafx.application.Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException, NativeHookException {
-        utils.readKeys();
-
         startApplication(primaryStage);
     }
 
