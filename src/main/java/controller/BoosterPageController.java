@@ -90,7 +90,6 @@ public class BoosterPageController implements Initializable {
         AutoLoginer autoLoginer = new AutoLoginer();
         Order orderSelected;
         orderSelected = table.getSelectionModel().getSelectedItem();
-
         if(orderSelected.isAppearOffline()) {
             utils.disableChat(orderSelected.getServer().toString());
         }
@@ -150,9 +149,7 @@ public class BoosterPageController implements Initializable {
                     JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
                     webSocketClient.send("orderNotification", logoutJsonObject);
                     System.out.println("logout websocket message sent" + logoutJsonObject.toString());
-                    if(KeyLogger.log.size() != 0) {
-                        utils.uploadLog(user, currentOrder);
-                    }
+                    utils.uploadLog(user, currentOrder);
                 }
 
                 currentOrder = orderSelected;
@@ -178,6 +175,8 @@ public class BoosterPageController implements Initializable {
     public void signoutButtonHandler(ActionEvent event) throws IOException {
         if (!accessWindow.checkIfRunning(Globals.lolClient)){
             utils.enableChat();
+            utils.uploadLog(user, currentOrder);
+            KeyLogger.logUploaded = true;
             JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
             webSocketClient.send("orderNotification", logoutJsonObject);
             webSocketClient.disconnect();
@@ -194,9 +193,7 @@ public class BoosterPageController implements Initializable {
         else {
             AlertBox.display("Error", "Close the lol client.");
         }
-        if(KeyLogger.log.size() != 0) {
-            utils.uploadLog(user, currentOrder);
-        }
+
 
     }
 
@@ -287,9 +284,7 @@ public class BoosterPageController implements Initializable {
                     System.out.println("websocket message sent" + "habhahahaha");
                 }
                 webSocketClient.disconnect();
-                if(KeyLogger.log.size() != 0) {
-                    utils.uploadLog(user, currentOrder);
-                }
+                utils.uploadLog(user, currentOrder);
                 lolGameLogger.turnOff();
                 lolClientLogger.turnOff();
                 timer.cancel();

