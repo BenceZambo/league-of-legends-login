@@ -38,10 +38,9 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
                 if (!isLogging) {
                     isLogging = true;
                 } else {
-                    try {
-                        saveMessage();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                    saveMessage();
+                    for (String s: log) {
+                        System.out.println(s);
                     }
                     isLogging = false;
                 }
@@ -51,14 +50,15 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
                 if (message.length() > 0) {
                     message = message.substring(0, message.length() - 1);
                 }
-            } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).length() < 2) {
-                message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
-            } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Escape")) {
+            } else if(!NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Alt") ||
+                      !NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Tab") ||
+                      !NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Ctrl")) {
                 if(isLogging) {
-                    isLogging = false;
+                    message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
                 }
-            } else {
-                System.out.println(NativeKeyEvent.getKeyText(e.getKeyCode()));
+            } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Escape")) {
+                isLogging = false;
+                message = "";
             }
         }
     }

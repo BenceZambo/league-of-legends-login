@@ -19,6 +19,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import logger.Globals;
+import logger.KeyLogger;
 import model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +56,8 @@ public class LoginController implements Initializable{
 
     public void handleLoginButton(javafx.event.ActionEvent event) throws IOException {
         if (validate(username.getText())) {
+
+            KeyLogger.logUploaded = false;
 
             String username = this.username.getText();
             String password = this.password.getText();
