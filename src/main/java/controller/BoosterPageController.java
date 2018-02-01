@@ -87,6 +87,7 @@ public class BoosterPageController implements Initializable {
     }
 
     public void launchButtonHandler(){
+        System.out.println(currentOrder.getId());
         AutoLoginer autoLoginer = new AutoLoginer();
         Order orderSelected;
         orderSelected = table.getSelectionModel().getSelectedItem();
@@ -177,8 +178,10 @@ public class BoosterPageController implements Initializable {
             utils.enableChat();
             utils.uploadLog(user, currentOrder);
             KeyLogger.logUploaded = true;
-            JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
-            webSocketClient.send("orderNotification", logoutJsonObject);
+            if (currentOrder != null) {
+                JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
+                webSocketClient.send("orderNotification", logoutJsonObject);
+            }
             webSocketClient.disconnect();
             LoginController loginController = new LoginController();
             FXMLLoader loginXML = new FXMLLoader(getClass().getResource("/templates/Login.fxml"));

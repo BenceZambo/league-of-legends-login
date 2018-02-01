@@ -8,6 +8,7 @@ import environment.ConfigFileWriter;
 import logger.Globals;
 import model.User;
 import model.orders.Order;
+import model.orders.Server;
 import view.AlertBox;
 
 import java.awt.*;
@@ -25,12 +26,25 @@ public class AutoLoginer {
     public void setUp(Order order){
         ConfigFileWriter configFileWriter = new ConfigFileWriter(Globals.LoLSettingsFilePath);
         String server = order.getServer().toString();
+        String serverName;
         String username = order.getLoginname();
+        switch (server) {
+            case "LAS":
+                serverName = "LA2";
+                break;
+            case "LAN":
+                serverName = "LA1";
+                break;
+            case "OCE":
+                serverName = "OC1";
+                break;
+            default:serverName = server;
+        }
 
         String newFileContent =  "install:\n" +
                 "    globals:\n" +
                 "        locale: \"en_US\"\n" +
-                "        region: \"" + server + "\"\n" +
+                "        region: \"" + serverName + "\"\n" +
                 "    login-remember-me:\n" +
                 "        rememberMe: false\n" +
                 "        username: \"" + username + "\"";
@@ -78,9 +92,26 @@ public class AutoLoginer {
     public boolean checkIfConfigFileValid(Order order){
         ConfigFileReader configFileReader = new ConfigFileReader(Globals.LoLSettingsFilePath);
         String fileContent = configFileReader.read();
+        String server = order.getServer().toString();
 
         if (order == null){
             return false;
+        }
+        if (server == Server.LAN.toString() || server == Server.LAS.toString() || server == Server.OCE.toString()){
+            switch (server) {
+                case "LAS":
+                    server = "LA2";
+                    break;
+                case "LAN":
+                    server = "LA1";
+                    break;
+                case "OCE":
+                    server = "OC1";
+                    break;
+            }
+            if (fileContent.indexOf(order.getLoginname()) != -1 && fileContent.indexOf(server) != -1){
+                return true;
+            }
         }
         if (fileContent.indexOf(order.getLoginname()) != -1 && fileContent.indexOf(order.getServer().toString()) != -1){
             System.out.println("loginname: " + order.getLoginname());
