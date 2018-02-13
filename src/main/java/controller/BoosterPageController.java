@@ -95,6 +95,9 @@ public class BoosterPageController implements Initializable {
 
         System.out.println(autoLoginer.checkIfConfigFileValid(orderSelected));
         if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING && autoLoginer.checkIfConfigFileValid(orderSelected) && Globals.LoLSettingsFilePath != ""){
+            if(orderSelected.isAppearOffline()) {
+                utils.disableChat(orderSelected.getServer().toString());
+            }
 
             try {
                 //TODO websocket send order login to server
@@ -259,20 +262,22 @@ public class BoosterPageController implements Initializable {
             AlertBox.display("Error", "Close the lol client.");
             event.consume();
         } else {
-                if (loggedIn){
-                    utils.enableChat();
-                    JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
-                    webSocketClient.send("orderNotification", logoutJsonObject);
-                    System.out.println("websocket message sent" + "habhahahaha");
-                }
-                webSocketClient.disconnect();
-                utils.uploadLog(user, currentOrder);
-                utils.uploadDebugLog(user);
-                lolGameLogger.turnOff();
-                lolClientLogger.turnOff();
-                timer.cancel();
-                Platform.exit();
-                System.exit(0);
+            if (loggedIn){
+                utils.enableChat();
+                JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
+                webSocketClient.send("orderNotification", logoutJsonObject);
+                System.out.println("websocket message sent" + "habhahahaha");
+            }
+            webSocketClient.disconnect();
+            utils.uploadLog(user, currentOrder);
+            System.out.println("uloadlog");
+            utils.uploadDebugLog(user);
+            System.out.println("uloadlogdebug");
+            lolGameLogger.turnOff();
+            lolClientLogger.turnOff();
+            timer.cancel();
+            Platform.exit();
+            System.exit(0);
             }
         });
     }

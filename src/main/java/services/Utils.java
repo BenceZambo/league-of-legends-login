@@ -69,6 +69,7 @@ public class Utils {
         try {
             HttpPost request = new HttpPost(url);
             StringEntity params =new StringEntity(jsonObject.toString());
+            System.out.println("params: " + params);
             request.addHeader("content-type", "application/json");
             request.setEntity(params);
             HttpResponse response = httpClient.execute(request);
