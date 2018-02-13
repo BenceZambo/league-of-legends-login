@@ -59,8 +59,6 @@ public class BoosterPageController implements Initializable {
     @FXML
     Button signOut;
     @FXML
-    Button setUpButton;
-    @FXML
     Button launchButton;
     @FXML
     TableView<Order> table;
@@ -87,88 +85,70 @@ public class BoosterPageController implements Initializable {
     }
 
     public void launchButtonHandler(){
-        System.out.println(currentOrder.getId());
+        Order orderSelected;
         AutoLoginer autoLoginer = new AutoLoginer();
-        Order orderSelected;
-        orderSelected = table.getSelectionModel().getSelectedItem();
-        if(orderSelected.isAppearOffline()) {
-            utils.disableChat(orderSelected.getServer().toString());
-        }
-        if (autoLoginer.checkIfConfigFileValid(orderSelected)){
 
-            if (closeMethodSet == false){
-                setClose();
-                lolGameLogger.turnOn();
-                lolClientLogger.turnOn();
-                closeMethodSet = true;
-            }
-
-            try {
-                autoLoginer.logMeIn(currentOrder.getLoginpassword());
-            } catch (AWTException e) {
-                e.printStackTrace();
-            }
-
-            if (didSetUp) {
-                JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, currentOrder);
-                webSocketClient.send("orderNotification", loginJsonObject);
-                System.out.println("login websocket sent" + loginJsonObject.toString());
-                didSetUp = false;
-            }
-
-            loggedIn = true;
-
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    ArrayList<String> runningProcesses = TaskKiller.requestRunningProccesses();
-                    for (String process : runningProcesses) {
-                        if(process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
-                            utils.scriptAlert = true;
-                        }
-                    }
-                }
-            }, 1000, 300000);
-
-        }else{
-            AlertBox.display("Set up failed", "Please press SetUp button before Launch. If you pressed it, then you did it with another order!");
-        }
-    }
-
-    @FXML
-    public void setUpButtonHandler() {
-        Order orderSelected;
         orderSelected = table.getSelectionModel().getSelectedItem();
 
-        if (!accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING && Globals.LoLClientFilePath != ""){
-            AutoLoginer autoLoginer = new AutoLoginer();
+        String username = orderSelected.getLoginname();
+        String password = orderSelected.getLoginpassword();
+
+        System.out.println(autoLoginer.checkIfConfigFileValid(orderSelected));
+        if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING && autoLoginer.checkIfConfigFileValid(orderSelected) && Globals.LoLSettingsFilePath != ""){
+
             try {
                 //TODO websocket send order login to server
-                autoLoginer.setUp(orderSelected);
 
+                if (closeMethodSet == false){
+                    setClose();
+                    lolGameLogger.turnOn();
+                    lolClientLogger.turnOn();
+                    closeMethodSet = true;
+                }
+
+                autoLoginer.logMeIn(username, password);
                 if (loggedIn){
                     JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
                     webSocketClient.send("orderNotification", logoutJsonObject);
                     System.out.println("logout websocket message sent" + logoutJsonObject.toString());
-                    utils.uploadLog(user, currentOrder);
+                    if(KeyLogger.log.size() != 0) {
+                        utils.uploadLog(user, currentOrder);
+                    }
                 }
-
+                JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, orderSelected);
+                webSocketClient.send("orderNotification", loginJsonObject);
+                System.out.println("login websocket sent" + loginJsonObject.toString());
                 currentOrder = orderSelected;
-                didSetUp = true;
+                loggedIn = true;
 
-            } catch (Exception e) {
-                e.printStackTrace();
+
+                timer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        ArrayList<String> runningProcesses = TaskKiller.requestRunningProccesses();
+                        for (String process : runningProcesses) {
+                            if(process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
+                                utils.scriptAlert = true;
+                            }
+                        }
+                    }
+                }, 1000, 300000);
+
+            } catch (AWTException e) {
                 AlertBox.display("Login fail", "Can't login");
             }
+        }
+        else if (!accessWindow.checkIfRunning(Globals.lolClient)){
+            AlertBox.display("Client does not run", "Please run the League of Legends client");
         }
         else if (orderSelected.getStatus() == Status.PAUSED){
             AlertBox.display("Order paused", "This order is paused, you cannot boost on this");
         }
-        else if (Globals.LoLClientFilePath == ""){
-            AlertBox.display("LoL Client location not found", "Please, set your LoL Client.exe file under the Settings menu!");
+        else if (!autoLoginer.checkIfConfigFileValid(orderSelected)){
+            AlertBox.display("Wrong server", "Your client is on wrong server please change it to the right one!");
         }
-        else if (accessWindow.checkIfRunning(Globals.lolClient)){
-            AlertBox.display("Client runs", "Please close the League of Legends client");
+        else if (Globals.LoLSettingsFilePath == ""){
+            AlertBox.display("No client file path setted!", "Please set your lol.exe under Settings before press launch!");
         }
     }
 
@@ -234,7 +214,6 @@ public class BoosterPageController implements Initializable {
         server_column.setCellValueFactory(new PropertyValueFactory<>("server"));
         status_column.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        setUpButton.setOnAction(event -> setUpButtonHandler());
         launchButton.setOnAction(event -> launchButtonHandler());
 
         signOut.setOnAction(event -> {
@@ -288,6 +267,7 @@ public class BoosterPageController implements Initializable {
                 }
                 webSocketClient.disconnect();
                 utils.uploadLog(user, currentOrder);
+                utils.uploadDebugLog(user);
                 lolGameLogger.turnOff();
                 lolClientLogger.turnOff();
                 timer.cancel();
