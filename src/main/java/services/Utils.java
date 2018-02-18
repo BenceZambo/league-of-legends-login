@@ -2,15 +2,19 @@ package services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.socket.utf8.UTF8;
 import logger.Globals;
 import logger.KeyLogger;
 import model.orders.Order;
 import model.User;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 import webService.AWSWebService;
@@ -68,10 +72,12 @@ public class Utils {
 
         try {
             HttpPost request = new HttpPost(url);
-            StringEntity params =new StringEntity(jsonObject.toString());
-            System.out.println("params: " + params);
-            request.addHeader("content-type", "application/json");
+            StringEntity params =new StringEntity(jsonObject.toString(), "UTF8");
+            params.setContentType("application/json");
+            request.setHeader("accept", "application/json");
+            request.setHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
             request.setEntity(params);
+            System.out.println(request.getEntity().getContent().read());
             HttpResponse response = httpClient.execute(request);
             System.out.println("status code: " + response.getStatusLine().getStatusCode());
         }catch (Exception ex) {
