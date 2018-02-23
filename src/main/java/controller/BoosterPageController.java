@@ -84,7 +84,6 @@ public class BoosterPageController implements Initializable {
     }
 
     public void launchButtonHandler(){
-        try {
             Order orderSelected;
             AutoLoginer autoLoginer = new AutoLoginer();
 
@@ -92,17 +91,16 @@ public class BoosterPageController implements Initializable {
 
             String username = orderSelected.getLoginname();
             String password = orderSelected.getLoginpassword();
-
-            System.out.println(autoLoginer.checkIfConfigFileValid(orderSelected));
-            if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING && autoLoginer.checkIfConfigFileValid(orderSelected) && Globals.LoLSettingsFilePath != ""){
-                if(orderSelected.isAppearOffline()) {
+        try {
+            if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING && autoLoginer.checkIfConfigFileValid(orderSelected)) {
+                if (orderSelected.isAppearOffline()) {
                     utils.disableChat(orderSelected.getServer().toString());
                 }
 
                 try {
                     //TODO websocket send order login to server
 
-                    if (closeMethodSet == false){
+                    if (closeMethodSet == false) {
                         setClose();
                         lolGameLogger.turnOn();
                         lolClientLogger.turnOn();
@@ -110,11 +108,11 @@ public class BoosterPageController implements Initializable {
                     }
 
                     autoLoginer.logMeIn(username, password);
-                    if (loggedIn){
+                    if (loggedIn) {
                         JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
                         webSocketClient.send("orderNotification", logoutJsonObject);
                         System.out.println("logout websocket message sent" + logoutJsonObject.toString());
-                        if(KeyLogger.log.size() != 0) {
+                        if (KeyLogger.log.size() != 0) {
                             utils.uploadLog(user, currentOrder);
                         }
                     }
@@ -130,7 +128,7 @@ public class BoosterPageController implements Initializable {
                         public void run() {
                             ArrayList<String> runningProcesses = TaskKiller.requestRunningProccesses();
                             for (String process : runningProcesses) {
-                                if(process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
+                                if (process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
                                     utils.scriptAlert = true;
                                 }
                             }
@@ -140,27 +138,15 @@ public class BoosterPageController implements Initializable {
                 } catch (AWTException e) {
                     AlertBox.display("Login fail", "Can't login");
                 }
-            }
-            else if (!accessWindow.checkIfRunning(Globals.lolClient)){
+            } else if (!accessWindow.checkIfRunning(Globals.lolClient)) {
                 AlertBox.display("Client does not run", "Please run the League of Legends client");
-            }
-            else if (orderSelected.getStatus() == Status.PAUSED){
+            } else if (orderSelected.getStatus() == Status.PAUSED) {
                 AlertBox.display("Order paused", "This order is paused, you cannot boost on this");
-            }
-            else if (!autoLoginer.checkIfConfigFileValid(orderSelected)){
+            } else if (!autoLoginer.checkIfConfigFileValid(orderSelected)) {
                 AlertBox.display("Wrong server", "Your client is on wrong server please change it to the right one!");
             }
-            else if (Globals.LoLSettingsFilePath.equals("")){
-                AlertBox.display("No client file path setted!", "Please set your lol.exe under Settings before press launch!");
-            }
-        } catch (Exception exception) {
-            StringWriter writer = new StringWriter();
-            PrintWriter printWriter = new PrintWriter( writer );
-            exception.printStackTrace( printWriter );
-            printWriter.flush();
-
-            String stackTrace = writer.toString();
-            AlertBox.display("Asd", stackTrace);
+        }catch (FileNotFoundException e) {
+            AlertBox.display("No client file path setted!", "Please set your lol.exe under Settings before press launch!");
         }
     }
 

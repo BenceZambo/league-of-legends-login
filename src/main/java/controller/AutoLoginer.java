@@ -17,6 +17,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class AutoLoginer {
@@ -121,7 +122,10 @@ public class AutoLoginer {
         }
     }
 
-    public boolean checkIfConfigFileValid(Order order){
+    public boolean checkIfConfigFileValid(Order order) throws FileNotFoundException{
+        if (Globals.LoLSettingsFilePath.equals("")){
+            throw new FileNotFoundException();
+        }
         ConfigFileReader configFileReader = new ConfigFileReader(Globals.LoLSettingsFilePath);
         String fileContent = configFileReader.read();
         String server = order.getServer().toString();
