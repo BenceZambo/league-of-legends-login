@@ -38,20 +38,18 @@ public class AutoLoginer {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = screenSize.getWidth();
-        KeyLogger.debugLog.add("Screen width: " + width);
+        KeyLogger.log.add("Screen width: " + width);
         double height = screenSize.getHeight();
-        KeyLogger.debugLog.add("Screen height: " + height);
+        KeyLogger.log.add("Screen height: " + height);
 
         WinDef.HWND hwnd = User32.INSTANCE.FindWindow(null, Globals.lolClient);
         WinDef.HWND hwnd1 = User32.INSTANCE.FindWindow("Shell_TrayWnd", null);
-        System.out.println(hwnd1.toString());
-        System.out.println("HWND ez az: " + hwnd.toString());
         WinDef.RECT rect = new WinDef.RECT();
         User32.INSTANCE.SetForegroundWindow(hwnd);
         User32.INSTANCE.GetWindowRect(hwnd, rect);
 
-        KeyLogger.debugLog.add("Rectangle height: " + rect.toRectangle().getHeight());
-        KeyLogger.debugLog.add("Rectangle width: " + rect.toRectangle().getWidth());
+        KeyLogger.log.add("Rectangle height: " + rect.toRectangle().getHeight());
+        KeyLogger.log.add("Rectangle width: " + rect.toRectangle().getWidth());
 
         if (rect.toRectangle().getHeight() > 29 || rect.toRectangle().getWidth() > 161) {
             int windowLeftCoordinate = rect.left;
@@ -62,22 +60,22 @@ public class AutoLoginer {
                 case 576:
                     x = windowLeftCoordinate + 1024 - 100;
                     y = windowTopCoordinate + 140;
-                    KeyLogger.debugLog.add("case 576: x: " + x);
-                    KeyLogger.debugLog.add("case 576: y: " + y);
+                    KeyLogger.log.add("case 576: x: " + x);
+                    KeyLogger.log.add("case 576: y: " + y);
                     break;
                 case 720:
                     x = windowLeftCoordinate + 1280 - 115;
                     y = windowTopCoordinate + 180;
-                    KeyLogger.debugLog.add("case 720: x: " + x);
-                    KeyLogger.debugLog.add("case 720: y: " + y);
+                    KeyLogger.log.add("case 720: x: " + x);
+                    KeyLogger.log.add("case 720: y: " + y);
                     break;
                 case 900:
                     x = windowLeftCoordinate + 1600 - 160;
                     y = windowTopCoordinate + 230;
-                    KeyLogger.debugLog.add("windowLeftCoordinate: " + windowLeftCoordinate);
-                    KeyLogger.debugLog.add("windowTopCoordinate: " + windowTopCoordinate);
-                    KeyLogger.debugLog.add("case 900: x: " + x);
-                    KeyLogger.debugLog.add("case 900: y: " + y);
+                    KeyLogger.log.add("windowLeftCoordinate: " + windowLeftCoordinate);
+                    KeyLogger.log.add("windowTopCoordinate: " + windowTopCoordinate);
+                    KeyLogger.log.add("case 900: x: " + x);
+                    KeyLogger.log.add("case 900: y: " + y);
                     break;
                 default:
                     x = 0;

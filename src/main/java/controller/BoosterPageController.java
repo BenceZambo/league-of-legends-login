@@ -49,7 +49,6 @@ public class BoosterPageController implements Initializable {
     OrderService orderService;
     boolean loggedIn = false;
     boolean closeMethodSet = false;
-    boolean didSetUp = false;
     Order currentOrder;
     @FXML
     MenuItem menuItem;
@@ -107,7 +106,6 @@ public class BoosterPageController implements Initializable {
                         closeMethodSet = true;
                     }
 
-                    autoLoginer.logMeIn(username, password);
                     if (loggedIn) {
                         JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
                         webSocketClient.send("orderNotification", logoutJsonObject);
@@ -116,6 +114,9 @@ public class BoosterPageController implements Initializable {
                             utils.uploadLog(user, currentOrder);
                         }
                     }
+
+                    autoLoginer.logMeIn(username, password);
+
                     JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, orderSelected);
                     webSocketClient.send("orderNotification", loginJsonObject);
                     System.out.println("login websocket sent" + loginJsonObject.toString());
@@ -265,9 +266,6 @@ public class BoosterPageController implements Initializable {
             }
             webSocketClient.disconnect();
             utils.uploadLog(user, currentOrder);
-            System.out.println("uloadlog");
-            utils.uploadDebugLog(user);
-            System.out.println("uloadlogdebug");
             lolGameLogger.turnOff();
             lolClientLogger.turnOff();
             timer.cancel();
