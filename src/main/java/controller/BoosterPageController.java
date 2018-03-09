@@ -283,10 +283,17 @@ public class BoosterPageController implements Initializable {
         ConfigFileWriter configFileWriter = new ConfigFileWriter("LoLClientFilePath.txt");
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Open File");
-        File file = chooser.showOpenDialog(new Stage());
-        configFileWriter.write(file.getAbsolutePath());
-        Globals.LoLClientFilePath = file.getAbsolutePath();
-
-        Globals.LoLSettingsFilePath = file.getAbsolutePath().replace("LeagueClient.exe", "Config\\LeagueClientSettings.yaml");
+        File file = null;
+        try {
+            file = chooser.showOpenDialog(new Stage());
+        }catch (Exception e){
+        }
+        if (file.getAbsolutePath().contains("LeagueClient.exe")) {
+            configFileWriter.write(file.getAbsolutePath());
+            Globals.LoLClientFilePath = file.getAbsolutePath();
+            Globals.LoLSettingsFilePath = file.getAbsolutePath().replace("LeagueClient.exe", "Config\\LeagueClientSettings.yaml");
+        }else{
+            AlertBox.display("Wrong file path", "Wrong file path, please select LeagueClient.exe");
+        }
     }
 }
