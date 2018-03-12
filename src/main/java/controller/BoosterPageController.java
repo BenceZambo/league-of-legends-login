@@ -33,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import services.OrderService;
+import services.SpamTimer;
 import services.Utils;
 import view.AlertBox;
 import webService.HttpHandler;
@@ -83,71 +84,79 @@ public class BoosterPageController implements Initializable {
     }
 
     public void launchButtonHandler(){
-            Order orderSelected;
-            AutoLoginer autoLoginer = new AutoLoginer();
+        Order orderSelected;
+        AutoLoginer autoLoginer = new AutoLoginer();
 
-            orderSelected = table.getSelectionModel().getSelectedItem();
+        orderSelected = table.getSelectionModel().getSelectedItem();
 
-            String username = orderSelected.getLoginname();
-            String password = orderSelected.getLoginpassword();
-        try {
-            if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING && autoLoginer.checkIfConfigFileValid(orderSelected)) {
-                if (orderSelected.isAppearOffline()) {
-                    utils.disableChat(orderSelected.getServer().toString());
-                }
-
-                try {
-                    //TODO websocket send order login to server
-
-                    if (closeMethodSet == false) {
-                        setClose();
-                        lolGameLogger.turnOn();
-                        lolClientLogger.turnOn();
-                        closeMethodSet = true;
+        String username = orderSelected.getLoginname();
+        String password = orderSelected.getLoginpassword();
+        if (username == null || password == null){
+            AlertBox.display("Missing password/usrname", "Login details are incomplete");
+        }else {
+            try {
+                if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING && autoLoginer.checkIfConfigFileValid(orderSelected)) {
+                    if (orderSelected.isAppearOffline()) {
+                        utils.disableChat(orderSelected.getServer().toString());
                     }
 
-                    if (loggedIn) {
-                        JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
-                        webSocketClient.send("orderNotification", logoutJsonObject);
-                        System.out.println("logout websocket message sent" + logoutJsonObject.toString());
-                        if (KeyLogger.log.size() != 0) {
-                            utils.uploadLog(user, currentOrder);
+                    try {
+
+                        if (closeMethodSet == false) {
+                            setClose();
+                            lolGameLogger.turnOn();
+                            lolClientLogger.turnOn();
+                            closeMethodSet = true;
                         }
-                    }
 
-                    autoLoginer.logMeIn(username, password);
-
-                    JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, orderSelected);
-                    webSocketClient.send("orderNotification", loginJsonObject);
-                    System.out.println("login websocket sent" + loginJsonObject.toString());
-                    currentOrder = orderSelected;
-                    loggedIn = true;
-
-
-                    timer.scheduleAtFixedRate(new TimerTask() {
-                        @Override
-                        public void run() {
-                            ArrayList<String> runningProcesses = TaskKiller.requestRunningProccesses();
-                            for (String process : runningProcesses) {
-                                if (process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
-                                    utils.scriptAlert = true;
-                                }
+                        if (loggedIn) {
+                            JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
+                            webSocketClient.send("orderNotification", logoutJsonObject);
+                            System.out.println("logout websocket message sent" + logoutJsonObject.toString());
+                            if (KeyLogger.log.size() != 0) {
+                                utils.uploadLog(user, currentOrder);
                             }
                         }
-                    }, 1000, 300000);
 
-                } catch (AWTException e) {
-                    AlertBox.display("Login fail", "Can't login");
+                        autoLoginer.logMeIn(username, password);
+
+                        if (!Globals.spamDefender) {
+                            JSONObject loginJsonObject = getLogInJSON(JSONType.LOGIN, orderSelected);
+                            webSocketClient.send("orderNotification", loginJsonObject);
+                            System.out.println("login websocket sent" + loginJsonObject.toString());
+                            Globals.spamDefender = true;
+                            Thread thread = new Thread(new SpamTimer());
+                            thread.start();
+                        }
+                        currentOrder = orderSelected;
+                        loggedIn = true;
+
+
+                        timer.scheduleAtFixedRate(new TimerTask() {
+                            @Override
+                            public void run() {
+                                ArrayList<String> runningProcesses = TaskKiller.requestRunningProccesses();
+                                for (String process : runningProcesses) {
+                                    if (process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
+                                        utils.scriptAlert = true;
+                                    }
+                                }
+                            }
+                        }, 1000, 300000);
+
+                    } catch (AWTException e) {
+                        AlertBox.display("Login fail", "Can't login");
+                    }
+                } else if (!accessWindow.checkIfRunning(Globals.lolClient)) {
+                    AlertBox.display("Client does not run", "Please run the League of Legends client");
+                } else if (orderSelected.getStatus() == Status.PAUSED) {
+                    AlertBox.display("Order paused", "This order is paused, you cannot boost on this");
+                } else if (!autoLoginer.checkIfConfigFileValid(orderSelected)) {
+                    AlertBox.display("Wrong server", "Your client is on wrong server please change it to the right one!");
                 }
-            } else if (!accessWindow.checkIfRunning(Globals.lolClient)) {
-                AlertBox.display("Client does not run", "Please run the League of Legends client");
-            } else if (orderSelected.getStatus() == Status.PAUSED) {
-                AlertBox.display("Order paused", "This order is paused, you cannot boost on this");
-            } else if (!autoLoginer.checkIfConfigFileValid(orderSelected)) {
-                AlertBox.display("Wrong server", "Your client is on wrong server please change it to the right one!");
+            } catch (FileNotFoundException e) {
+                AlertBox.display("No client file path setted!", "Please set your lol.exe under Settings before press launch!");
             }
-        }catch (FileNotFoundException e) {
-            AlertBox.display("No client file path setted!", "Please set your lol.exe under Settings before press launch!");
         }
     }
 

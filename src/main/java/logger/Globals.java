@@ -7,4 +7,6 @@ public class Globals {
     public static String LoLClientFilePath = "";
     public static String LoLSettingsFilePath = "";
     public static String logUploadURL = "http://api.boostroyal.com/uploadLogs";
+    // Do not touch it!!!
+    public static Boolean spamDefender = false;
 }

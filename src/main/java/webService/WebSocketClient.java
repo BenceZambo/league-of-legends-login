@@ -40,7 +40,7 @@ public class WebSocketClient {
                                 System.out.println("WARNING");
                                 boosterPageController.initData();
                                 Thread thread = new Thread(new WindowWatcher());
-                                thread.run();
+                                thread.start();
                             }
                             if (type == "unpause") {
                                 boosterPageController.initData();
