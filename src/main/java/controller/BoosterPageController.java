@@ -92,7 +92,7 @@ public class BoosterPageController implements Initializable {
         String username = orderSelected.getLoginname();
         String password = orderSelected.getLoginpassword();
         if (username == null || password == null){
-            AlertBox.display("Missing password/usrname", "Login details are incomplete");
+            AlertBox.display("Missing password/username", "Login details are incomplete");
         }else {
             try {
                 if (accessWindow.checkIfRunning(Globals.lolClient) && orderSelected.getStatus() == Status.PROCESSING && autoLoginer.checkIfConfigFileValid(orderSelected)) {
@@ -109,7 +109,7 @@ public class BoosterPageController implements Initializable {
                             closeMethodSet = true;
                         }
 
-                        if (loggedIn) {
+                        if (loggedIn && !Globals.spamDefender) {
                             JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
                             webSocketClient.send("orderNotification", logoutJsonObject);
                             System.out.println("logout websocket message sent" + logoutJsonObject.toString());
