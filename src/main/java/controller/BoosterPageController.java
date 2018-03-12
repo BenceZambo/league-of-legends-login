@@ -169,6 +169,7 @@ public class BoosterPageController implements Initializable {
             if (currentOrder != null) {
                 JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
                 webSocketClient.send("orderNotification", logoutJsonObject);
+                loggedIn = false;
             }
             webSocketClient.disconnect();
             LoginController loginController = new LoginController();
@@ -268,11 +269,11 @@ public class BoosterPageController implements Initializable {
             event.consume();
         } else {
             if (loggedIn){
-                utils.enableChat();
                 JSONObject logoutJsonObject = getLogInJSON(JSONType.LOGOUT, currentOrder);
                 webSocketClient.send("orderNotification", logoutJsonObject);
                 System.out.println("websocket message sent" + "habhahahaha");
             }
+            utils.enableChat();
             webSocketClient.disconnect();
             utils.uploadLog(user, currentOrder);
             lolGameLogger.turnOff();
