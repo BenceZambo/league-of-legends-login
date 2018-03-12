@@ -92,6 +92,7 @@
                             <headerType>gui</headerType>
                             <jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
                             <outfile>${project.build.directory}/boostroyal.exe</outfile>
+                            <manifest>src/main/resources/boostroyalManifest.exe.manifest</manifest>
                             <classPath>
                                 <mainClass>Main</mainClass>
                                 <preCp>anything</preCp>
@@ -175,7 +176,16 @@
             <optional>true</optional>
             <version>1.0.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.4</version>
+        </dependency>
 
 
     </dependencies>

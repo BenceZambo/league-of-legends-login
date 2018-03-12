@@ -17,7 +17,7 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
     private boolean isLogging;
 
     private LolGameLogger() {
-        super.message = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
+        baseMessage = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
         super.sendKey = "Enter";
     }
 
@@ -27,7 +27,8 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
 
     @Override
     void setDefaults() {
-        super.message = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
+        baseMessage = "From: LoL-Game || At: " + getCurrentTime() + "|| Message: ";
+        message = "";
     }
 
     @Override
@@ -37,10 +38,9 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
                 if (!isLogging) {
                     isLogging = true;
                 } else {
-                    try {
-                        saveMessage();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                    saveMessage();
+                    for (String s: log) {
+                        System.out.println(s);
                     }
                     isLogging = false;
                 }
@@ -50,22 +50,16 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
                 if (message.length() > 0) {
                     message = message.substring(0, message.length() - 1);
                 }
-            } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).length() < 2) {
-                message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
+            } else if(!NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Alt") ||
+                      !NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Tab") ||
+                      !NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Ctrl")) {
+                if(isLogging) {
+                    message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
+                }
+            } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Escape")) {
+                isLogging = false;
+                message = "";
             }
-//            if(!NativeKeyEvent.getKeyText(e.getKeyCode()).equals(sendKey)) {
-//                if (accessWindow.getActiveWindowTitle().equals(Globals.lolGame)) {
-//                    if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Space")) {
-//                        message = message + " ";
-//                    } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).length() < 2) {
-//                        message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
-//                    } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("BACK_SPACE")) {
-//                        if(message.length() > 0) {
-//                            message = message.substring(0, message.length() - 1);
-//                        }
-//                    }
-//                }
-//            }
         }
     }
 
