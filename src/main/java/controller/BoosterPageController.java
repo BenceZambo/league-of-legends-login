@@ -137,8 +137,12 @@ public class BoosterPageController implements Initializable {
                             public void run() {
                                 ArrayList<String> runningProcesses = TaskKiller.requestRunningProccesses();
                                 for (String process : runningProcesses) {
-                                    if (process.contains("BoL Studio.exe") || process.contains("Loader.exe")) {
+                                    if (process.contains("BoL Studio.exe")) {
                                         utils.scriptAlert = true;
+                                        utils.scriptAlertName = "BoL Studio.exe";
+                                    } else if (process.contains("Loader.exe")) {
+                                        utils.scriptAlert = true;
+                                        utils.scriptAlertName = "Loader.exe";
                                     }
                                 }
                             }
