@@ -1,13 +1,16 @@
 package services;
 
+import com.amazonaws.util.IOUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import logger.Globals;
 import logger.KeyLogger;
 import model.orders.Order;
 import model.User;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -127,15 +130,36 @@ public class Utils {
     }
 
     private String getMyCountry() {
-        try (Scanner s = new Scanner(new java.net.URL("https://usercountry.com/v1.0/json/" + getMyIp()).openStream(), "UTF-8").useDelimiter("\\A")) {
-            JSONObject jsonObject = new JSONObject(s.nextLine());
-            return jsonObject.get("country").toString();
-        } catch (IOException e) {
-            return "couldn't find his Country";
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return "couldn't find his Country";
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        String result;
+
+        try {
+            HttpGet request = new HttpGet("https://usercountry.com/v1.0/json/" + getMyIp());
+            request.setHeader("accept", "application/json");
+            request.setHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+            HttpResponse response = httpClient.execute(request);
+            HttpEntity entity = response.getEntity();
+            InputStream instream = entity.getContent();
+            result = IOUtils.toString(instream);
+            JSONObject finalResult = new JSONObject(result);
+            System.out.println("RESPONSE: " + finalResult.get("country"));
+            System.out.println("status code: " + response.getStatusLine().getStatusCode());
+            return (String) finalResult.get("country");
+        }catch (Exception ex) {
+            System.out.println(ex);
+            return "couldn't find his country, oops";
         }
+//        try (Scanner s = new Scanner(new java.net.URL("https://usercountry.com/v1.0/json/" + getMyIp()).openStream(), "UTF-8").useDelimiter("\\A")) {
+//            JSONObject jsonObject = new JSONObject(s.nextLine());
+//            return jsonObject.get("country").toString();
+//        } catch (IOException e) {
+//            System.out.println(e);
+//            e.printStackTrace();
+//            return "couldn't find his Country";
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//            return "couldn't find his Country";
+//        }
     }
 
     public void disableChat(String server) {
