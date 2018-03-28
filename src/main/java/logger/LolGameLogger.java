@@ -50,15 +50,24 @@ public class LolGameLogger extends KeyLogger implements NativeKeyListener {
                 if (message.length() > 0) {
                     message = message.substring(0, message.length() - 1);
                 }
-            } else if(!NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Alt") ||
-                      !NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Tab") ||
-                      !NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Ctrl")) {
-                if(isLogging) {
-                    message = message + NativeKeyEvent.getKeyText(e.getKeyCode());
-                }
             } else if(NativeKeyEvent.getKeyText(e.getKeyCode()).equals("Escape")) {
                 isLogging = false;
                 message = "";
+            }
+            else if(
+                    !NativeKeyEvent.getKeyText(e.getKeyCode()).contains("Alt") &&
+                            !NativeKeyEvent.getKeyText(e.getKeyCode()).contains("Tab") &&
+                            !NativeKeyEvent.getKeyText(e.getKeyCode()).contains("Ctrl") &&
+                            !NativeKeyEvent.getKeyText(e.getKeyCode()).contains("Shift") &&
+                            !NativeKeyEvent.getKeyText(e.getKeyCode()).contains("null") &&
+                            !NativeKeyEvent.getKeyText(e.getKeyCode()).contains("Undefined") &&
+                            !NativeKeyEvent.getKeyText(e.getKeyCode()).contains("Caps") &&
+                            !NativeKeyEvent.getKeyText(e.getKeyCode()).contains("Lock")
+                    )
+            {
+                if(isLogging) {
+                    message = message + NativeKeyEvent.getKeyText(e.getKeyCode()).toLowerCase();
+                }
             }
         }
     }

